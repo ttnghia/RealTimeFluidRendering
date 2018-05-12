@@ -41,11 +41,10 @@ public:
 
     FluidRenderWidget(QWidget* parent = 0);
 
-    const std::shared_ptr<ParticleSystemData>&       getParticleDataObj() const;
-    const std::vector<std::shared_ptr<MeshObject> >& getMeshObjs() const;
-    const auto&                                      getLightObjs() const { return m_Lights; }
+    const std::shared_ptr<ParticleSystemData>&      getParticleDataObj() const;
+    const std::vector<std::shared_ptr<MeshObject>>& getMeshObjs() const;
+    const auto& getLightObjs() const { return m_Lights; }
 
-    void setCamera(const glm::vec3& cameraPosition, const glm::vec3& cameraFocus);
     void setBox(const glm::vec3& boxMin, const glm::vec3& boxMax);
 
 protected:
@@ -150,7 +149,6 @@ private:
 
     std::shared_ptr<ParticleSystemData> m_ParticleData = std::make_shared<ParticleSystemData>();
 
-
     void initRDataParticle();
     void initFluidVAOs();
     void uploadParticleColorData();
@@ -165,7 +163,6 @@ private:
                              int                                   texelSize  = 1,
                              float                                 scaleValue = 1.0);
     void runDepthFilter();
-
 
     ////////////////////////////////////////////////////////////////////////////////
     struct RDataDepthPass
@@ -386,7 +383,6 @@ private:
     void initRDataFilterModifiedGaussian();
     void filterModifiedGaussian();
 
-
     ////////////////////////////////////////////////////////////////////////////////
     void initRDataMeshes();
     void renderMeshes();
@@ -394,36 +390,36 @@ private:
     ////////////////////////////////////////////////////////////////////////////////
     struct RDataFluidShadowMap
     {
-        std::vector<std::shared_ptr<OpenGLTexture> >     fluidShadowMaps;
-        std::vector<std::unique_ptr<DepthBufferRender> > depthMapRenders;
-        std::shared_ptr<ShaderProgram>                   shader = nullptr;
-        GLuint                                           VAO;
-        GLuint                                           v_Position;
-        GLuint                                           v_AnisotropyMatrix0;
-        GLuint                                           v_AnisotropyMatrix1;
-        GLuint                                           v_AnisotropyMatrix2;
-        GLuint                                           ub_LightMatrices;
-        GLuint                                           u_LightID;
-        GLuint                                           u_PointRadius;
-        GLuint                                           u_UseAnisotropyKernel;
-        GLuint                                           u_ScreenWidth;
-        GLuint                                           u_ScreenHeight;
-//        GLuint                                           u_PointScale;
+        std::vector<std::shared_ptr<OpenGLTexture>>     fluidShadowMaps;
+        std::vector<std::unique_ptr<DepthBufferRender>> depthMapRenders;
+        std::shared_ptr<ShaderProgram>                  shader = nullptr;
+        GLuint                                          VAO;
+        GLuint                                          v_Position;
+        GLuint                                          v_AnisotropyMatrix0;
+        GLuint                                          v_AnisotropyMatrix1;
+        GLuint                                          v_AnisotropyMatrix2;
+        GLuint                                          ub_LightMatrices;
+        GLuint                                          u_LightID;
+        GLuint                                          u_PointRadius;
+        GLuint                                          u_UseAnisotropyKernel;
+        GLuint                                          u_ScreenWidth;
+        GLuint                                          u_ScreenHeight;
+        //        GLuint                                           u_PointScale;
 
         bool initialized = false;
     } m_RDataFluidShadowMap;
 
     struct RDataFluidShadowThickness
     {
-        std::vector<std::shared_ptr<OpenGLTexture> >   fluidShadowThickness;
-        std::vector<std::unique_ptr<OffScreenRender> > offScreenRenders;
-        std::shared_ptr<ShaderProgram>                 shader = nullptr;
-        GLuint                                         VAO;
-        GLuint                                         v_Position;
-        GLuint                                         ub_LightMatrices;
-        GLuint                                         u_LightID;
-        GLuint                                         u_PointRadius;
-        GLuint                                         u_PointScale;
+        std::vector<std::shared_ptr<OpenGLTexture>>   fluidShadowThickness;
+        std::vector<std::unique_ptr<OffScreenRender>> offScreenRenders;
+        std::shared_ptr<ShaderProgram>                shader = nullptr;
+        GLuint                                        VAO;
+        GLuint                                        v_Position;
+        GLuint                                        ub_LightMatrices;
+        GLuint                                        u_LightID;
+        GLuint                                        u_PointRadius;
+        GLuint                                        u_PointScale;
 
         bool initialized = false;
     } m_RDataFluidShadowThickness;
@@ -434,19 +430,18 @@ private:
 
     struct RDataSolidLightDepthMap
     {
-        std::vector<std::unique_ptr<DepthBufferRender> > depthMapRenders;
-        std::shared_ptr<ShaderProgram>                   shader            = nullptr;
-        std::shared_ptr<OpenGLBuffer>                    bufferModelMatrix = nullptr;
-        std::vector<std::shared_ptr<OpenGLTexture> >     solidShadowMaps;
-        GLuint                                           v_Position;
-        GLuint                                           ub_ModelMatrix;
-        GLuint                                           ub_LightMatrices;
-        GLuint                                           u_LightID;
-        GLuint                                           VAOs[MAX_NUM_MESHES];
+        std::vector<std::unique_ptr<DepthBufferRender>> depthMapRenders;
+        std::shared_ptr<ShaderProgram>                  shader            = nullptr;
+        std::shared_ptr<OpenGLBuffer>                   bufferModelMatrix = nullptr;
+        std::vector<std::shared_ptr<OpenGLTexture>>     solidShadowMaps;
+        GLuint                                          v_Position;
+        GLuint                                          ub_ModelMatrix;
+        GLuint                                          ub_LightMatrices;
+        GLuint                                          u_LightID;
+        GLuint                                          VAOs[MAX_NUM_MESHES];
 
         bool initialized = false;
     } m_RDataSolidLightDepthMap;
-
 
     struct RDataSolidCameraDepthMap
     {
@@ -479,15 +474,15 @@ private:
     bool  m_bExrportFrameToImage = false;
 
     ////////////////////////////////////////////////////////////////////////////////
-    std::vector<std::shared_ptr<ShaderProgram> > m_ExternalShaders;
-    std::vector<std::shared_ptr<MeshObject> >    m_MeshObjs;
-    std::shared_ptr<PointLights>                 m_Lights;
+    std::vector<std::shared_ptr<ShaderProgram>> m_ExternalShaders;
+    std::vector<std::shared_ptr<MeshObject>>    m_MeshObjs;
+    std::shared_ptr<PointLights>                m_Lights;
 
-    std::vector<std::unique_ptr<FRMeshRender> > m_MeshRenders;
-    std::unique_ptr<SkyBoxRender>               m_SkyBoxRender        = nullptr;
-    std::unique_ptr<FRPlaneRender>              m_PlaneRender         = nullptr;
-    std::unique_ptr<PointLightRender>           m_LightRender         = nullptr;
-    std::unique_ptr<WireFrameBoxRender>         m_WireFrameBoxRender  = nullptr;
-    std::unique_ptr<ScreenQuadTextureRender>    m_ScreenQuadTexRender = nullptr;
-    std::unique_ptr<OffScreenRender>            m_FilterFrameBuffer   = nullptr;
+    std::vector<std::unique_ptr<FRMeshRender>> m_MeshRenders;
+    std::unique_ptr<SkyBoxRender>              m_SkyBoxRender        = nullptr;
+    std::unique_ptr<FRPlaneRender>             m_PlaneRender         = nullptr;
+    std::unique_ptr<PointLightRender>          m_LightRender         = nullptr;
+    std::unique_ptr<WireFrameBoxRender>        m_WireFrameBoxRender  = nullptr;
+    std::unique_ptr<ScreenQuadTextureRender>   m_ScreenQuadTexRender = nullptr;
+    std::unique_ptr<OffScreenRender>           m_FilterFrameBuffer   = nullptr;
 };

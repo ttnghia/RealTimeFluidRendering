@@ -20,29 +20,26 @@
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 //#define BENCHMARK_FILTER
 
-#define DEFAULT_CLEAR_COLOR     Vec4f(1.0, 1.0, 1.0, 1.0)
 #define DEFAULT_CAMERA_POSITION glm::vec3(-4.0, 4.0, -3.0)
 #define DEFAULT_CAMERA_FOCUS    glm::vec3(0, 1, 0)
 
 #define CUSTOM_PARTICLE_MATERIAL         \
     {                                    \
-        Vec4f(0.2 * 0.2),                \
+        Vec4f( 0.2 * 0.2),               \
         Vec4f(0.69, 0.957, 0.259, 1.00), \
-        Vec4f(1),                        \
+        Vec4f(   1),                     \
         250.0,                           \
         std::string("ParticleMaterial")  \
     }
 
-
 #define CUSTOM_SURFACE_MATERIAL         \
     {                                   \
-        Vec4f(0.1,  0.1, 0.1, 1.0),     \
+        Vec4f( 0.1, 0.1, 0.1, 1.0),     \
         Vec4f(0.42, 0.5, 1.0, 1.0),     \
-        Vec4f(1.0,  1.0, 1.0, 1.0),     \
+        Vec4f( 1.0, 1.0, 1.0, 1.0),     \
         250.0,                          \
         std::string("ParticleMaterial") \
     }
-
 
 #define DEFAULT_FLUID_VOLUME_MATERIAL Material::MT_Jade
 #define DEFAULT_MESH_MATERIAL_BK      Material::MT_Brass
@@ -51,12 +48,10 @@
     {                                             \
         Vec4f(0.329412, 0.223529, 0.027451, 1.0), \
         Vec4f(0.780392, 0.568627, 0.113725, 1.0), \
-        Vec4f(1.0,  1.0, 1.0, 1.0),               \
+        Vec4f(     1.0,      1.0,      1.0, 1.0), \
         250.0,                                    \
         std::string("MeshMaterial")               \
     }
-
-
 
 #define PARTICLE_COLOR_RAMP       \
     {                             \
@@ -128,7 +123,6 @@ public:
         NumFilters
     };
 };
-
 
 class GLSLPrograms
 {

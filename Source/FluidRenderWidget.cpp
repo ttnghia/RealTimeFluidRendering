@@ -23,11 +23,8 @@
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 FluidRenderWidget::FluidRenderWidget(QWidget* parent) : OpenGLWidget(parent)
 {
-    m_ClearColor = DEFAULT_CLEAR_COLOR;
-    //    m_ClearColor = Vec3f(0.0f, 0.0f, 0.0f);
-    setCamera(DEFAULT_CAMERA_POSITION, DEFAULT_CAMERA_FOCUS);
+    setCamera(QtAppUtils::getDefaultCamera(DEFAULT_CAMERA_POSITION, DEFAULT_CAMERA_FOCUS));
     enableRenderBox(false);
-    //    m_DefaultSize = QSize(1920 * 1.2, 1080 * 1.2);
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -40,12 +37,6 @@ const std::shared_ptr<ParticleSystemData>& FluidRenderWidget::getParticleDataObj
 const std::vector<std::shared_ptr<MeshObject>>& FluidRenderWidget::getMeshObjs() const
 {
     return m_MeshObjs;
-}
-
-//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-void FluidRenderWidget::setCamera(const Vec3f& cameraPosition, const Vec3f& cameraFocus)
-{
-    m_Camera->setCamera(cameraPosition, cameraFocus, Vec3f(0, 1, 0));
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
