@@ -1,17 +1,21 @@
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-//
-//  Copyright (c) 2017 by
-//       __      _     _         _____
-//    /\ \ \__ _| |__ (_) __ _  /__   \_ __ _   _  ___  _ __   __ _
-//   /  \/ / _` | '_ \| |/ _` |   / /\/ '__| | | |/ _ \| '_ \ / _` |
-//  / /\  / (_| | | | | | (_| |  / /  | |  | |_| | (_) | | | | (_| |
-//  \_\ \/ \__, |_| |_|_|\__,_|  \/   |_|   \__,_|\___/|_| |_|\__, |
-//         |___/                                              |___/
-//
-//  <nghiatruong.vn@gmail.com>
-//  All rights reserved.
-//
+//                                .--,       .--,
+//                               ( (  \.---./  ) )
+//                                '.__/o   o\__.'
+//                                   {=  ^  =}
+//                                    >  -  <
+//     ___________________________.""`-------`"".____________________________
+//    /                                                                      \
+//    \    This file is part of Banana - a graphics programming framework    /
+//    /                    Created: 2017 by Nghia Truong                     \
+//    \                      <nghiatruong.vn@gmail.com>                      /
+//    /                      https://ttnghia.github.io                       \
+//    \                        All rights reserved.                          /
+//    /                                                                      \
+//    \______________________________________________________________________/
+//                                  ___)( )(___
+//                                 (((__) (__)))
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -86,7 +90,6 @@ bool DataManager::loadDataInfo(QString dataPath)
         std::istringstream iss(line);
         iss >> paramName >> paramValue;
 
-
         if(paramName == "num_fluid_particles" || paramName == "num_fluid_particle") {
             m_DataInfo->num_particles = atoi(paramValue.c_str());
             continue;
@@ -96,7 +99,6 @@ bool DataManager::loadDataInfo(QString dataPath)
             m_DataInfo->max_num_particles = atoi(paramValue.c_str());
             continue;
         }
-
 
         if(paramName == "fluid_particle_radius") {
             m_DataInfo->particle_radius = atof(paramValue.c_str());
@@ -168,9 +170,6 @@ bool DataManager::loadDataInfo(QString dataPath)
             continue;
         }
 
-
-
-
         if(paramName == "num_cells[0]") {
             m_DataInfo->num_cells[0] = atoi(paramValue.c_str());
             continue;
@@ -185,7 +184,6 @@ bool DataManager::loadDataInfo(QString dataPath)
             m_DataInfo->num_cells[2] = atoi(paramValue.c_str());
             continue;
         }
-
 
         if(paramName == "camera_position[0]") {
             m_DataInfo->camera_position[0] = atof(paramValue.c_str());
@@ -205,7 +203,6 @@ bool DataManager::loadDataInfo(QString dataPath)
             continue;
         }
 
-
         if(paramName == "camera_focus[0]") {
             m_DataInfo->camera_focus[0] = atof(paramValue.c_str());
             m_DataInfo->hasCameraInfo   = true;
@@ -223,7 +220,6 @@ bool DataManager::loadDataInfo(QString dataPath)
             m_DataInfo->hasCameraInfo   = true;
             continue;
         }
-
 
         if(paramName == "light_position[0]") {
             m_DataInfo->light_position[0] = atof(paramValue.c_str());

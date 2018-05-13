@@ -1,17 +1,21 @@
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-//
-//  Copyright (c) 2017 by
-//       __      _     _         _____
-//    /\ \ \__ _| |__ (_) __ _  /__   \_ __ _   _  ___  _ __   __ _
-//   /  \/ / _` | '_ \| |/ _` |   / /\/ '__| | | |/ _ \| '_ \ / _` |
-//  / /\  / (_| | | | | | (_| |  / /  | |  | |_| | (_) | | | | (_| |
-//  \_\ \/ \__, |_| |_|_|\__,_|  \/   |_|   \__,_|\___/|_| |_|\__, |
-//         |___/                                              |___/
-//
-//  <nghiatruong.vn@gmail.com>
-//  All rights reserved.
-//
+//                                .--,       .--,
+//                               ( (  \.---./  ) )
+//                                '.__/o   o\__.'
+//                                   {=  ^  =}
+//                                    >  -  <
+//     ___________________________.""`-------`"".____________________________
+//    /                                                                      \
+//    \    This file is part of Banana - a graphics programming framework    /
+//    /                    Created: 2017 by Nghia Truong                     \
+//    \                      <nghiatruong.vn@gmail.com>                      /
+//    /                      https://ttnghia.github.io                       \
+//    \                        All rights reserved.                          /
+//    /                                                                      \
+//    \______________________________________________________________________/
+//                                  ___)( )(___
+//                                 (((__) (__)))
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -535,7 +539,6 @@ void FluidRenderWidget::computeParticleAnisotropyKernel()
     GLfloat* kernelMatrices = reinterpret_cast<GLfloat*>(m_ParticleData->getArray("AnisotropyKernelMatrix")->data());
 
     AnisotropicKernelGenerator<3, float> aniKernelGenerator(m_ParticleData->getNParticles(), particles, m_ParticleData->getParticleRadius<float>());
-    //    aniKernelGenerator.setParameters(0.5f, 8.0f);
     aniKernelGenerator.computeAniKernels();
     memcpy(particles,      aniKernelGenerator.kernelCenters().data(),  sizeof(Vec3r) * m_ParticleData->getNParticles());
     memcpy(kernelMatrices, aniKernelGenerator.kernelMatrices().data(), sizeof(Mat3x3r) * m_ParticleData->getNParticles());
@@ -619,9 +622,9 @@ void FluidRenderWidget::runDepthFilter()
             break;
         }
 
-        case FilterMethod::ModifiedGaussian1D2D:
-        case FilterMethod::ModifiedGaussian1D:
-        case FilterMethod::ModifiedGaussian2D:
+        case FilterMethod::NarrowRangeFilter1D2D:
+        case FilterMethod::NarrowRangeFilter1D:
+        case FilterMethod::NarrowRangeFilter2D:
         {
             filterModifiedGaussian();
             break;
@@ -1443,7 +1446,7 @@ void FluidRenderWidget::filterModifiedGaussian()
     m_FilterFrameBuffer->beginRender();
 
     ////////////////////////////////////////////////////////////////////////////////
-    if(m_FilterMethod == FilterMethod::ModifiedGaussian2D) {
+    if(m_FilterMethod == FilterMethod::NarrowRangeFilter2D) {
         m_RDataFilterModifiedGaussian.shader->setUniformValue(m_RDataFilterModifiedGaussian.u_DoFilter1D, 0);
 
         for(int i = 0; i < m_NumFilterIteration; ++i) {
@@ -1459,7 +1462,7 @@ void FluidRenderWidget::filterModifiedGaussian()
     } else {
         m_RDataFilterModifiedGaussian.shader->setUniformValue(m_RDataFilterModifiedGaussian.u_DoFilter1D, 1);
 
-        for(int i = 0, iend = m_FilterMethod == FilterMethod::ModifiedGaussian1D2D ? m_NumFilterIteration - 1 : m_NumFilterIteration; i < iend; ++i) {
+        for(int i = 0, iend = m_FilterMethod == FilterMethod::NarrowRangeFilter1D2D ? m_NumFilterIteration - 1 : m_NumFilterIteration; i < iend; ++i) {
             if(i > 0) {
                 m_FilterFrameBuffer->fastSwapColorBuffer(m_RDataCompositionPass.depthTex);
             }
@@ -1478,7 +1481,7 @@ void FluidRenderWidget::filterModifiedGaussian()
             m_RDataCompositionPass.depthTex->release();
         }
 
-        if(m_FilterMethod == FilterMethod::ModifiedGaussian1D2D && m_NumFilterIteration > 0) {
+        if(m_FilterMethod == FilterMethod::NarrowRangeFilter1D2D && m_NumFilterIteration > 0) {
             m_FilterFrameBuffer->fastSwapColorBuffer(m_RDataCompositionPass.depthTex);
             m_RDataFilterModifiedGaussian.shader->setUniformValue(m_RDataFilterModifiedGaussian.u_DoFilter1D, -1);
             m_RDataCompositionPass.depthTex->bind();

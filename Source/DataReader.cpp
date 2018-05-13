@@ -1,18 +1,22 @@
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-//
-//  Copyright (c) 2017 by
-//       __      _     _         _____
-//    /\ \ \__ _| |__ (_) __ _  /__   \_ __ _   _  ___  _ __   __ _
-//   /  \/ / _` | '_ \| |/ _` |   / /\/ '__| | | |/ _ \| '_ \ / _` |
-//  / /\  / (_| | | | | | (_| |  / /  | |  | |_| | (_) | | | | (_| |
-//  \_\ \/ \__, |_| |_|_|\__,_|  \/   |_|   \__,_|\___/|_| |_|\__, |
-//         |___/                                              |___/
-//
-//  <nghiatruong.vn@gmail.com>
-//  All rights reserved.
-//
-//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+4-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//                                .--,       .--,
+//                               ( (  \.---./  ) )
+//                                '.__/o   o\__.'
+//                                   {=  ^  =}
+//                                    >  -  <
+//     ___________________________.""`-------`"".____________________________
+//    /                                                                      \
+//    \    This file is part of Banana - a graphics programming framework    /
+//    /                    Created: 2017 by Nghia Truong                     \
+//    \                      <nghiatruong.vn@gmail.com>                      /
+//    /                      https://ttnghia.github.io                       \
+//    \                        All rights reserved.                          /
+//    /                                                                      \
+//    \______________________________________________________________________/
+//                                  ___)( )(___
+//                                 (((__) (__)))
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 #include "Common.h"
@@ -100,7 +104,7 @@ void DataReader::setParticleDataObj(const std::shared_ptr<ParticleSystemData>& p
     }
 }
 
-void DataReader::setMeshObj(const std::vector<std::shared_ptr<MeshObject> >& meshObj)
+void DataReader::setMeshObj(const std::vector<std::shared_ptr<MeshObject>>& meshObj)
 {
     Q_ASSERT(meshObj.size() > 0);
 
@@ -166,7 +170,6 @@ void DataReader::readNextFrame()
         return;
     }
 
-
     readFrame(nextFrame);
 }
 
@@ -214,9 +217,9 @@ void DataReader::readFrame(int frame)
 
         if(m_DataInfo->num_particles != m_ParticleData->getNParticles()) {
             m_ParticleData->setNumParticles(m_DataInfo->num_particles);
-            m_ParticleData->setUInt("ColorRandomReady",     0);
-            m_ParticleData->setUInt("ColorRampReady",       0);
-//            m_ParticleData->setUInt("AnisotrpyMatrixReady", 0);
+            m_ParticleData->setUInt("ColorRandomReady", 0);
+            m_ParticleData->setUInt("ColorRampReady",   0);
+            //            m_ParticleData->setUInt("AnisotrpyMatrixReady", 0);
 
             emit numParticlesChanged(m_DataInfo->num_particles);
         }
@@ -270,17 +273,16 @@ bool DataReader::readFluidPosition(int frameID)
 #else
     memcpy(m_ParticleData->getArray("Position")->data(), &m_VReadBuffer.data()[18 * sizeof(unsigned int)],            3 * numParticles * sizeof(float));
 
-//    static Vector<String> strs(numParticles);
-//    Vec3f*                ppos = (Vec3f*)m_ParticleData->getArray("Position")->data();
+    //    static Vector<String> strs(numParticles);
+    //    Vec3f*                ppos = (Vec3f*)m_ParticleData->getArray("Position")->data();
 
-//    for(UInt i = 0; i < numParticles; ++i) {
-//        strs[i] = String("v ") + NumberHelpers::formatToScientific(ppos[i][0], 10) + String(" ") + NumberHelpers::formatToScientific(ppos[i][1], 10) + String(" ") + NumberHelpers::formatToScientific(ppos[i][2], 10);
-//    }
+    //    for(UInt i = 0; i < numParticles; ++i) {
+    //        strs[i] = String("v ") + NumberHelpers::formatToScientific(ppos[i][0], 10) + String(" ") + NumberHelpers::formatToScientific(ppos[i][1], 10) + String(" ") + NumberHelpers::formatToScientific(ppos[i][2], 10);
+    //    }
 
-
-//    static char buff[512];
-//    __BNN_SPRINT(buff, "%s/%s/%s.%d.%s", m_DataPath.toStdString().c_str(), "Fluid", "frame", frameID, "obj");
-//    FileHelpers::writeFile(strs, buff);
+    //    static char buff[512];
+    //    __BNN_SPRINT(buff, "%s/%s/%s.%d.%s", m_DataPath.toStdString().c_str(), "Fluid", "frame", frameID, "obj");
+    //    FileHelpers::writeFile(strs, buff);
 #endif
     ////////////////////////////////////////////////////////////////////////////////
     return true;

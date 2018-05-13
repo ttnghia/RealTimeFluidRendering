@@ -1,17 +1,21 @@
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-//
-//  Copyright (c) 2017 by
-//       __      _     _         _____
-//    /\ \ \__ _| |__ (_) __ _  /__   \_ __ _   _  ___  _ __   __ _
-//   /  \/ / _` | '_ \| |/ _` |   / /\/ '__| | | |/ _ \| '_ \ / _` |
-//  / /\  / (_| | | | | | (_| |  / /  | |  | |_| | (_) | | | | (_| |
-//  \_\ \/ \__, |_| |_|_|\__,_|  \/   |_|   \__,_|\___/|_| |_|\__, |
-//         |___/                                              |___/
-//
-//  <nghiatruong.vn@gmail.com>
-//  All rights reserved.
-//
+//                                .--,       .--,
+//                               ( (  \.---./  ) )
+//                                '.__/o   o\__.'
+//                                   {=  ^  =}
+//                                    >  -  <
+//     ___________________________.""`-------`"".____________________________
+//    /                                                                      \
+//    \    This file is part of Banana - a graphics programming framework    /
+//    /                    Created: 2017 by Nghia Truong                     \
+//    \                      <nghiatruong.vn@gmail.com>                      /
+//    /                      https://ttnghia.github.io                       \
+//    \                        All rights reserved.                          /
+//    /                                                                      \
+//    \______________________________________________________________________/
+//                                  ___)( )(___
+//                                 (((__) (__)))
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -40,7 +44,7 @@ public:
 
     void setDataPath(QString dataPath, const std::shared_ptr<SimulationDataInfo>& dataInfo);
     void setParticleDataObj(const std::shared_ptr<ParticleSystemData>& particleData);
-    void setMeshObj(const std::vector<std::shared_ptr<MeshObject> >& meshObj);
+    void setMeshObj(const std::vector<std::shared_ptr<MeshObject>>& meshObj);
 
 signals:
     void currentFrameChanged(int currentFrame);
@@ -83,14 +87,13 @@ private:
     size_t   m_ReadBytes;
     AvgTimer m_ReadTimer;
 
-
     std::unique_ptr<QTimer>             m_AutoTimer    = nullptr;
     std::shared_ptr<SimulationDataInfo> m_DataInfo     = nullptr;
     std::shared_ptr<ParticleSystemData> m_ParticleData = nullptr;
 
-    std::vector<std::shared_ptr<MeshObject> > m_MeshObj;
-    std::vector<unsigned char>                m_VReadBuffer;
-    std::function<std::string(int)>           m_GenFluidPosFileName;
-    std::function<std::string(int)>           m_GenFluidAniMatrixFileName;
-    std::function<std::string(int)>           m_GenMeshFileName;
+    std::vector<std::shared_ptr<MeshObject>> m_MeshObj;
+    std::vector<unsigned char>               m_VReadBuffer;
+    std::function<std::string(int)>          m_GenFluidPosFileName;
+    std::function<std::string(int)>          m_GenFluidAniMatrixFileName;
+    std::function<std::string(int)>          m_GenMeshFileName;
 };
