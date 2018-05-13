@@ -1,3 +1,23 @@
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//                                .--,       .--,
+//                               ( (  \.---./  ) )
+//                                '.__/o   o\__.'
+//                                   {=  ^  =}
+//                                    >  -  <
+//     ___________________________.""`-------`"".____________________________
+//    /                                                                      \
+//    \    This file is part of Banana - a graphics programming framework    /
+//    /                    Created: 2018 by Nghia Truong                     \
+//    \                      <nghiatruong.vn@gmail.com>                      /
+//    /                      https://ttnghia.github.io                       \
+//    \                        All rights reserved.                          /
+//    /                                                                      \
+//    \______________________________________________________________________/
+//                                  ___)( )(___
+//                                 (((__) (__)))
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 // fragment shader, depth map shading
 #version 410 core
 
@@ -16,30 +36,28 @@ uniform int   u_UseAnisotropyKernel;
 uniform int   u_ScreenWidth;
 uniform int   u_ScreenHeight;
 
-in vec3       f_ViewCenter;
-flat in mat3  f_AnisotropyMatrix;
+in vec3      f_ViewCenter;
+flat in mat3 f_AnisotropyMatrix;
 
-out float     outDepth;
+out float outDepth;
 
-//------------------------------------------------------------------------------------------
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 void main()
 {
     vec3 viewDir = normalize(f_ViewCenter);
     vec3 normal;
     vec3 fragPos;
 
-    if(u_UseAnisotropyKernel == 0)
-    {
+    if(u_UseAnisotropyKernel == 0) {
         normal.xy = gl_PointCoord.xy * vec2(2.0, -2.0) + vec2(-1.0, 1.0);
         float mag = dot(normal.xy, normal.xy);
 
-        if(mag > 1.0)
+        if(mag > 1.0) {
             discard;           // kill pixels outside circle
+        }
         normal.z = sqrt(1.0 - mag);
         fragPos  = f_ViewCenter + normal * u_PointRadius;
-    }
-    else
-    {
+    } else {
         vec3 fc = gl_FragCoord.xyz;
         fc.xy /= vec2(u_ScreenWidth, u_ScreenHeight);
         fc    *= 2.0;
@@ -59,9 +77,9 @@ void main()
         // solve the ray-sphere intersection
         float tmp   = dot(rayDirT, camT - centerT);
         float delta = tmp * tmp - dot(camT - centerT, camT - centerT) + 1.0;
-        if(delta < 0.0)
+        if(delta < 0.0) {
             discard;             // kill pixels outside circle in parameter space
-
+        }
         float d                  = -tmp - sqrt(delta);
         vec3  intersectionPointT = camT + rayDirT * d;
         fragPos = transMatrix * intersectionPointT;;

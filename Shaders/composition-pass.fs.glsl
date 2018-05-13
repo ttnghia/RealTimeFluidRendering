@@ -1,3 +1,23 @@
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//                                .--,       .--,
+//                               ( (  \.---./  ) )
+//                                '.__/o   o\__.'
+//                                   {=  ^  =}
+//                                    >  -  <
+//     ___________________________.""`-------`"".____________________________
+//    /                                                                      \
+//    \    This file is part of Banana - a graphics programming framework    /
+//    /                    Created: 2018 by Nghia Truong                     \
+//    \                      <nghiatruong.vn@gmail.com>                      /
+//    /                      https://ttnghia.github.io                       \
+//    \                        All rights reserved.                          /
+//    /                                                                      \
+//    \______________________________________________________________________/
+//                                  ___)( )(___
+//                                 (((__) (__)))
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 // fragment shader, compositing pass
 #version 410 core
 
@@ -127,15 +147,15 @@ vec3 computeAttennuation(float thickness)
 }
 
 const int lightID = 0;
-//------------------------------------------------------------------------------------------
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 void main()
 {
     float eyeDepth  = texture(u_DepthTex, f_TexCoord).r;
     vec3  backColor = texture(u_BackgroundTex, f_TexCoord).xyz;
     if(u_HasSolid == 1) {
 #ifdef FIXED_SPOT
-//        float dx            = 1.0f / 1080.0f;
-//        float dy            = 1.0f / 1920.0f;
+        //        float dx            = 1.0f / 1080.0f;
+        //        float dy            = 1.0f / 1920.0f;
         float dx            = 1.0f / 1620.0f;
         float dy            = 1.0f / 2880.0f;
         float solidDepth_nx = texture(u_SolidDepthMap, f_TexCoord + vec2(-dx, 0)).r;
@@ -162,7 +182,6 @@ void main()
 
     vec3 position = uvToEye(f_TexCoord, eyeDepth);
     vec3 viewer   = normalize(-position.xyz);
-
 
     vec3  lightDir = normalize(vec3(viewMatrix * lights[lightID].position) - position);
     vec3  H        = normalize(lightDir + viewer);

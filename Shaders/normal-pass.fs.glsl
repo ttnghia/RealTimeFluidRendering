@@ -1,3 +1,23 @@
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//                                .--,       .--,
+//                               ( (  \.---./  ) )
+//                                '.__/o   o\__.'
+//                                   {=  ^  =}
+//                                    >  -  <
+//     ___________________________.""`-------`"".____________________________
+//    /                                                                      \
+//    \    This file is part of Banana - a graphics programming framework    /
+//    /                    Created: 2018 by Nghia Truong                     \
+//    \                      <nghiatruong.vn@gmail.com>                      /
+//    /                      https://ttnghia.github.io                       \
+//    \                        All rights reserved.                          /
+//    /                                                                      \
+//    \______________________________________________________________________/
+//                                  ___)( )(___
+//                                 (((__) (__)))
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 // fragment shader, normal pass
 #version 410 core
 
@@ -15,14 +35,13 @@ uniform sampler2D u_DepthTex;
 uniform int       u_ScreenWidth;
 uniform int       u_ScreenHeight;
 
-//------------------------------------------------------------------------------------------
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 const float far  = 1000.0f;
 const float near = 0.1f;
 
-
 in vec2  f_TexCoord;
 out vec3 outNormal;
-//------------------------------------------------------------------------------------------
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 //Depth used in the Z buffer is not linearly related to distance from camera
 //This restores linear depth
 
@@ -33,16 +52,16 @@ float linearizeDepth(float depth, float near, float far)
 
 vec3 uvToEye(vec2 texCoord, float depth)
 {
-    float x = texCoord.x * 2.0 - 1.0;
-    float y = texCoord.y * 2.0 - 1.0;
+    float x  = texCoord.x * 2.0 - 1.0;
+    float y  = texCoord.y * 2.0 - 1.0;
     float zn = ((far + near) / (far - near) * depth + 2 * far * near / (far - near)) / depth;
 
-    vec4  clipPos = vec4(x, y, zn, 1.0f);
-    vec4  viewPos = inverse(projectionMatrix) * clipPos;
+    vec4 clipPos = vec4(x, y, zn, 1.0f);
+    vec4 viewPos = inverse(projectionMatrix) * clipPos;
     return viewPos.xyz / viewPos.w;
 }
 
-//------------------------------------------------------------------------------------------
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 void main()
 {
     float pixelWidth  = 1 / float(u_ScreenWidth);
@@ -60,8 +79,7 @@ void main()
     float depthyp = texture(u_DepthTex, vec2(x, yp)).r;
     float depthyn = texture(u_DepthTex, vec2(x, yn)).r;
 
-    if(depth < -999.0f)
-    {
+    if(depth < -999.0f) {
         outNormal = vec3(0, 1, 0);
         return;
     }
@@ -74,7 +92,6 @@ void main()
 
     vec3 dx = (abs(dxr.z) < abs(dxl.z)) ? dxr : dxl;
 
-
     vec3 positionyp = uvToEye(vec2(x, yp), depthyp);
     vec3 positionyn = uvToEye(vec2(x, yn), depthyn);
     vec3 dyb        = position - positionyn;
@@ -82,12 +99,12 @@ void main()
 
     vec3 dy = (abs(dyt.z) < abs(dyb.z)) ? dyt : dyb;
 
-
     //Compute Gradients of Depth and Cross Product Them to Get Normal
     vec3 N = normalize(cross(dx, dy));
     if(isnan(N.x) || isnan(N.y) || isnan(N.y) ||
-       isinf(N.x) || isinf(N.y) || isinf(N.z))
+       isinf(N.x) || isinf(N.y) || isinf(N.z)) {
         N = vec3(0, 0, 1);
+    }
 
     outNormal = N;
 }

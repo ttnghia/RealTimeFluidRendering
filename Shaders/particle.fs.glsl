@@ -1,7 +1,31 @@
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//                                .--,       .--,
+//                               ( (  \.---./  ) )
+//                                '.__/o   o\__.'
+//                                   {=  ^  =}
+//                                    >  -  <
+//     ___________________________.""`-------`"".____________________________
+//    /                                                                      \
+//    \    This file is part of Banana - a graphics programming framework    /
+//    /                    Created: 2018 by Nghia Truong                     \
+//    \                      <nghiatruong.vn@gmail.com>                      /
+//    /                      https://ttnghia.github.io                       \
+//    \                        All rights reserved.                          /
+//    /                                                                      \
+//    \______________________________________________________________________/
+//                                  ___)( )(___
+//                                 (((__) (__)))
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 // fragment shader, particle render
 #version 410 core
 
-#define NUM_TOTAL_LIGHTS 8
+#define COLOR_MODE_UNIFORM_MATERIAL 0
+#define COLOR_MODE_RANDOM           1
+#define COLOR_MODE_RAMP             2
+
+#define NUM_TOTAL_LIGHTS            8
 struct PointLight
 {
     vec4 ambient;
@@ -34,12 +58,11 @@ layout(std140) uniform Material
     float shininess;
 } material;
 
-uniform int   u_HasVColor;
+uniform int   u_ColorMode;
 uniform float u_PointRadius;
 uniform int   u_UseAnisotropyKernel;
 uniform int   u_ScreenWidth;
 uniform int   u_ScreenHeight;
-
 
 in vec3      f_ViewCenter;
 in vec3      f_CenterPos;
@@ -51,10 +74,10 @@ out vec4 outColor;
 //------------------------------------------------------------------------------------------
 vec3 shadeLight(int lightID, vec3 normal, vec3 fragPos, vec3 viewDir)
 {
-//    vec3 lightDir = normalize(vec3(/*viewMatrix */ lights[lightID].position) - fragPos);
+    //    vec3 lightDir = normalize(vec3(/*viewMatrix */ lights[lightID].position) - fragPos);
     vec3 lightDir     = normalize(vec3(viewMatrix * lights[lightID].position) - fragPos);
     vec3 halfDir      = normalize(lightDir - viewDir);
-    vec4 surfaceColor = (u_HasVColor == 1) ? vec4(f_Color, 1.0) : material.diffuse;
+    vec4 surfaceColor = (u_ColorMode == COLOR_MODE_UNIFORM_MATERIAL) ? material.diffuse : vec4(f_Color, 1.0);
 
     vec4 ambientColor  = lights[lightID].ambient * material.ambient;
     vec4 diffuseColor  = lights[lightID].diffuse * vec4(max(dot(normal, lightDir), 0.0)) * surfaceColor;

@@ -1,3 +1,23 @@
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//                                .--,       .--,
+//                               ( (  \.---./  ) )
+//                                '.__/o   o\__.'
+//                                   {=  ^  =}
+//                                    >  -  <
+//     ___________________________.""`-------`"".____________________________
+//    /                                                                      \
+//    \    This file is part of Banana - a graphics programming framework    /
+//    /                    Created: 2018 by Nghia Truong                     \
+//    \                      <nghiatruong.vn@gmail.com>                      /
+//    /                      https://ttnghia.github.io                       \
+//    \                        All rights reserved.                          /
+//    /                                                                      \
+//    \______________________________________________________________________/
+//                                  ___)( )(___
+//                                 (((__) (__)))
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 // fragment shader, curvature flow pass
 #version 410 core
 
@@ -16,11 +36,11 @@ uniform float     u_ParticleRadius;
 uniform int       u_ScreenWidth;
 uniform int       u_ScreenHeight;
 
-in vec2           f_TexCoord;
-out float         outDepth;
+in vec2   f_TexCoord;
+out float outDepth;
 
-const float thresholdRatio    = 5.0;
-//------------------------------------------------------------------------------------------
+const float thresholdRatio = 5.0;
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 vec3 meanCurvature(vec2 pos)
 {
     // Width of one pixel
@@ -44,7 +64,6 @@ vec3 meanCurvature(vec2 pos)
     float zdx2 = zdxp + zdxn - 2.0f * zc;
     float zdy2 = zdyp + zdyn - 2.0f * zc;
 
-
     // Second order finite differences, alternating variables
     float zdxpyp = texture(u_DepthTex, pos + dx + dy).r - 1.0f;
     float zdxnyn = texture(u_DepthTex, pos - dx - dy).r - 1.0f;
@@ -53,20 +72,17 @@ vec3 meanCurvature(vec2 pos)
 
     float zdxy = (zdxpyp + zdxnyn - zdxpyn - zdxnyp) / 4.0f;
 
-    if(abs(zdx) > u_ParticleRadius * thresholdRatio)
-    {
+    if(abs(zdx) > u_ParticleRadius * thresholdRatio) {
         zdx  = 0.0f;
         zdx2 = 0.0f;
     }
 
-    if(abs(zdy) > u_ParticleRadius * thresholdRatio)
-    {
+    if(abs(zdy) > u_ParticleRadius * thresholdRatio) {
         zdy  = 0.0f;
         zdy2 = 0.0f;
     }
 
-    if(abs(zdxy) > u_ParticleRadius * thresholdRatio)
-    {
+    if(abs(zdxy) > u_ParticleRadius * thresholdRatio) {
         zdxy = 0.0f;
     }
 
@@ -94,12 +110,9 @@ vec3 meanCurvature(vec2 pos)
 void main()
 {
     float particleDepth = texture(u_DepthTex, f_TexCoord).r;
-    if(particleDepth < -1000.0f || particleDepth > 0)
-    {
+    if(particleDepth < -1000.0f || particleDepth > 0) {
         outDepth = particleDepth;
-    }
-    else
-    {
+    } else {
         const float dt   = 0.0003f;
         const float dzt  = 1000.0f;
         vec3        dxyz = meanCurvature(f_TexCoord);
