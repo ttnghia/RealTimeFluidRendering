@@ -24,8 +24,6 @@
 #include <Banana/Utils/FileHelpers.h>
 #include <fstream>
 
-#define NEW_DATA
-
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 DataReader::DataReader()
 {
@@ -172,16 +170,11 @@ bool DataReader::readFluidPosition(int frameID)
     m_ReadBytes += fileSize;
     m_ReadTimer.tock();
     ////////////////////////////////////////////////////////////////////////////////
-    unsigned int numParticles;
-    float        particleRadius;
+    UInt  numParticles;
+    float particleRadius;
 
-#ifdef NEW_DATA
-    memcpy(&numParticles,   m_VReadBuffer.data(),                             sizeof(unsigned int));
-    memcpy(&particleRadius, &m_VReadBuffer.data()[sizeof(unsigned int)],      sizeof(float));
-#else
-    memcpy(&numParticles,   &m_VReadBuffer.data()[5 * sizeof(unsigned int)],  sizeof(unsigned int));
-    memcpy(&particleRadius, &m_VReadBuffer.data()[11 * sizeof(unsigned int)], sizeof(float));
-#endif
+    memcpy(&numParticles,   m_VReadBuffer.data(),                sizeof(UInt));
+    memcpy(&particleRadius, &m_VReadBuffer.data()[sizeof(UInt)], sizeof(float));
 
     if(fabs(particleRadius - m_DataInfo->particle_radius) > 1e-6) {
         m_DataInfo->particle_radius = particleRadius;
@@ -195,22 +188,7 @@ bool DataReader::readFluidPosition(int frameID)
         m_ParticleData->allocate(numParticles);
     }
 
-#ifdef NEW_DATA
-    memcpy(m_ParticleData->getArray("Position")->data(), &m_VReadBuffer.data()[sizeof(unsigned int) + sizeof(float)], 3 * numParticles * sizeof(float));
-#else
-    memcpy(m_ParticleData->getArray("Position")->data(), &m_VReadBuffer.data()[18 * sizeof(unsigned int)],            3 * numParticles * sizeof(float));
-
-    //    static Vector<String> strs(numParticles);
-    //    Vec3f*                ppos = (Vec3f*)m_ParticleData->getArray("Position")->data();
-
-    //    for(UInt i = 0; i < numParticles; ++i) {
-    //        strs[i] = String("v ") + NumberHelpers::formatToScientific(ppos[i][0], 10) + String(" ") + NumberHelpers::formatToScientific(ppos[i][1], 10) + String(" ") + NumberHelpers::formatToScientific(ppos[i][2], 10);
-    //    }
-
-    //    static char buff[512];
-    //    __BNN_SPRINT(buff, "%s/%s/%s.%d.%s", m_DataPath.toStdString().c_str(), "Fluid", "frame", frameID, "obj");
-    //    FileHelpers::writeFile(strs, buff);
-#endif
+    memcpy(m_ParticleData->getArray("Position")->data(), &m_VReadBuffer.data()[sizeof(UInt) + sizeof(float)], 3 * numParticles * sizeof(float));
     ////////////////////////////////////////////////////////////////////////////////
     return true;
 }
@@ -234,13 +212,13 @@ bool DataReader::readFluidAnisotropyKernel(int frameID)
     m_ReadBytes += fileSize;
     m_ReadTimer.tock();
     ////////////////////////////////////////////////////////////////////////////////
-    unsigned int numParticles;
-    memcpy(&numParticles, m_VReadBuffer.data(), sizeof(unsigned int));
+    UInt numParticles;
+    memcpy(&numParticles, m_VReadBuffer.data(), sizeof(UInt));
     Q_ASSERT(numParticles == m_DataInfo->num_particles);
     ////////////////////////////////////////////////////////////////////////////////
     size_t dataSize = 9 * numParticles * sizeof(float);
-    Q_ASSERT(dataSize + sizeof(unsigned int) == fileSize);
-    memcpy(m_ParticleData->getArray("AnisotropyKernelMatrix")->data(), &m_VReadBuffer.data()[sizeof(unsigned int)], dataSize);
+    Q_ASSERT(dataSize + sizeof(UInt) == fileSize);
+    memcpy(m_ParticleData->getArray("AnisotropyKernelMatrix")->data(), &m_VReadBuffer.data()[sizeof(UInt)], dataSize);
     m_ParticleData->setUInt("AnisotrpyMatrixReady", 1);
     ////////////////////////////////////////////////////////////////////////////////
     return true;
@@ -265,19 +243,18 @@ bool DataReader::readMeshes(int frameID)
     m_ReadBytes += fileSize;
     m_ReadTimer.tock();
     ////////////////////////////////////////////////////////////////////////////////
-    unsigned int numMeshes = 0;
-#ifdef NEW_DATA
-    memcpy(&numMeshes, m_VReadBuffer.data(), sizeof(unsigned int));
+    UInt numMeshes = 0;
+    memcpy(&numMeshes, m_VReadBuffer.data(), sizeof(UInt));
 
     for(int i = numMeshes; i < m_DataInfo->num_meshes; ++i) {
         m_MeshObj[i]->clearData();
     }
 
-    size_t offset   = sizeof(unsigned int);
-    size_t dataSize = sizeof(unsigned int);
+    size_t offset   = sizeof(UInt);
+    size_t dataSize = sizeof(UInt);
 
-    for(unsigned int i = 0; i < numMeshes; ++i) {
-        unsigned int numVertices;
+    for(UInt i = 0; i < numMeshes; ++i) {
+        UInt numVertices;
         dataSize = sizeof(UInt);
 
         memcpy(&numVertices, &m_VReadBuffer.data()[offset], dataSize);
@@ -291,16 +268,6 @@ bool DataReader::readMeshes(int frameID)
         m_MeshObj[i]->setVertexNormal((void*)&m_VReadBuffer.data()[offset], dataSize);
         offset += dataSize;
     }
-#else
-    numMeshes = 1;
-    unsigned int numVertices;
-
-    memcpy(&numVertices, &m_VReadBuffer.data()[5 * sizeof(unsigned int)], sizeof(unsigned int));
-
-    size_t dataSize = 3 * numVertices * sizeof(float);
-    m_MeshObj[0]->setVertices((void*)&m_VReadBuffer.data()[18 * sizeof(unsigned int)], dataSize);
-    m_MeshObj[0]->setVertexNormal((void*)&m_VReadBuffer.data()[24 * sizeof(unsigned int) + dataSize], dataSize);
-#endif
 
     // emit directly here
     emit meshesChanged();
