@@ -63,7 +63,7 @@ void RenderWidget::renderOpenGL()
                 generateSolidLightDepthMaps();
                 generateFluidShadowMaps();
                 generateFluidShadowThicknessMaps();
-                glViewport(0, 0, width(), height());
+                glCall(glViewport(0, 0, width(), height()));
             }
 
             renderFluidFloor();
@@ -81,14 +81,13 @@ void RenderWidget::renderOpenGL()
                 generateSolidLightDepthMaps();
                 generateFluidShadowMaps();
                 generateFluidShadowThicknessMaps();
-                glViewport(0, 0, width(), height());
             }
 
             renderDepthPass();
             runDepthFilter();
             renderNormalPass();
             renderThicknessPass();
-            filterThickness();
+            //            filterThickness();
             renderBackgroundPass();
             renderCompositionPass();
             break;
@@ -1265,6 +1264,7 @@ void RenderWidget::renderCompositionPass()
 
     ////////////////////////////////////////////////////////////////////////////////
     glCall(glBindVertexArray(m_RDataCompositionPass.VAO));
+    glCall(glViewport(0, 0, width(), height()));
     glCall(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
     glCall(glBindVertexArray(0));
 
