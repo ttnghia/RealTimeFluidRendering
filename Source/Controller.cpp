@@ -276,20 +276,20 @@ void Controller::setupFilterControllers()
 {
     ////////////////////////////////////////////////////////////////////////////////
     /// filter method
-    QRadioButton* rdbBilateralGaussian    = new QRadioButton(QString("Bilateral Gaussian"));
-    QRadioButton* rdbCurvatureFlow        = new QRadioButton(QString("Curvature Flow"));
-    QRadioButton* rdbPlaneFitting         = new QRadioButton(QString("Plane Fitting"));
-    QRadioButton* rdbModifiedGaussian1D2D = new QRadioButton(QString("NRR. Filter 1D2D"));
-    QRadioButton* rdbModifiedGaussian1D   = new QRadioButton(QString("NRR. Filter 1D"));
-    QRadioButton* rdbModifiedGaussian2D   = new QRadioButton(QString("NRR. Filter 2D"));
+    QRadioButton* rdbBilateralGaussian = new QRadioButton(QString("Bilateral Gaussian"));
+    QRadioButton* rdbCurvatureFlow     = new QRadioButton(QString("Curvature Flow"));
+    QRadioButton* rdbPlaneFitting      = new QRadioButton(QString("Plane Fitting"));
+    QRadioButton* rdbNarrowRange1D2D   = new QRadioButton(QString("NRR. Filter 1D2D"));
+    QRadioButton* rdbNarrowRange1D     = new QRadioButton(QString("NRR. Filter 1D"));
+    QRadioButton* rdbNarrowRange2D     = new QRadioButton(QString("NRR. Filter 2D"));
 
     QGridLayout* filterMethodLayout = new QGridLayout;
-    filterMethodLayout->addWidget(rdbBilateralGaussian,    0, 0);
-    filterMethodLayout->addWidget(rdbCurvatureFlow,        0, 1);
-    filterMethodLayout->addWidget(rdbPlaneFitting,         1, 0);
-    filterMethodLayout->addWidget(rdbModifiedGaussian1D2D, 1, 1);
-    filterMethodLayout->addWidget(rdbModifiedGaussian1D,   2, 0);
-    filterMethodLayout->addWidget(rdbModifiedGaussian2D,   2, 1);
+    filterMethodLayout->addWidget(rdbBilateralGaussian, 0, 0);
+    filterMethodLayout->addWidget(rdbCurvatureFlow,     0, 1);
+    filterMethodLayout->addWidget(rdbPlaneFitting,      1, 0);
+    filterMethodLayout->addWidget(rdbNarrowRange1D2D,   1, 1);
+    filterMethodLayout->addWidget(rdbNarrowRange1D,     2, 0);
+    filterMethodLayout->addWidget(rdbNarrowRange2D,     2, 1);
 
     QGroupBox* filterMethodGroup = new QGroupBox;
     filterMethodGroup->setTitle(tr("Surface Filter Method"));
@@ -297,20 +297,20 @@ void Controller::setupFilterControllers()
     m_LayoutRenderControllers->addWidget(filterMethodGroup);
 
     m_smFilterMethod = new QSignalMapper(this);
-    connect(rdbBilateralGaussian,    SIGNAL(clicked()), m_smFilterMethod, SLOT(map()));
-    connect(rdbCurvatureFlow,        SIGNAL(clicked()), m_smFilterMethod, SLOT(map()));
-    connect(rdbPlaneFitting,         SIGNAL(clicked()), m_smFilterMethod, SLOT(map()));
-    connect(rdbModifiedGaussian1D2D, SIGNAL(clicked()), m_smFilterMethod, SLOT(map()));
-    connect(rdbModifiedGaussian1D,   SIGNAL(clicked()), m_smFilterMethod, SLOT(map()));
-    connect(rdbModifiedGaussian2D,   SIGNAL(clicked()), m_smFilterMethod, SLOT(map()));
+    connect(rdbBilateralGaussian, SIGNAL(clicked()), m_smFilterMethod, SLOT(map()));
+    connect(rdbCurvatureFlow,     SIGNAL(clicked()), m_smFilterMethod, SLOT(map()));
+    connect(rdbPlaneFitting,      SIGNAL(clicked()), m_smFilterMethod, SLOT(map()));
+    connect(rdbNarrowRange1D2D,   SIGNAL(clicked()), m_smFilterMethod, SLOT(map()));
+    connect(rdbNarrowRange1D,     SIGNAL(clicked()), m_smFilterMethod, SLOT(map()));
+    connect(rdbNarrowRange2D,     SIGNAL(clicked()), m_smFilterMethod, SLOT(map()));
 
-    m_smFilterMethod->setMapping(rdbBilateralGaussian,    static_cast<int>(FilterMethod::BilateralGaussian));
-    m_smFilterMethod->setMapping(rdbCurvatureFlow,        static_cast<int>(FilterMethod::CurvatureFlow));
-    m_smFilterMethod->setMapping(rdbPlaneFitting,         static_cast<int>(FilterMethod::PlaneFitting));
-    m_smFilterMethod->setMapping(rdbModifiedGaussian1D2D, static_cast<int>(FilterMethod::NarrowRangeFilter1D2D));
-    m_smFilterMethod->setMapping(rdbModifiedGaussian1D,   static_cast<int>(FilterMethod::NarrowRangeFilter1D));
-    m_smFilterMethod->setMapping(rdbModifiedGaussian2D,   static_cast<int>(FilterMethod::NarrowRangeFilter2D));
-    rdbBilateralGaussian->setChecked(true);
+    m_smFilterMethod->setMapping(rdbBilateralGaussian, static_cast<int>(FilterMethod::BilateralGaussian));
+    m_smFilterMethod->setMapping(rdbCurvatureFlow,     static_cast<int>(FilterMethod::CurvatureFlow));
+    m_smFilterMethod->setMapping(rdbPlaneFitting,      static_cast<int>(FilterMethod::PlaneFitting));
+    m_smFilterMethod->setMapping(rdbNarrowRange1D2D,   static_cast<int>(FilterMethod::NarrowRangeFilter1D2D));
+    m_smFilterMethod->setMapping(rdbNarrowRange1D,     static_cast<int>(FilterMethod::NarrowRangeFilter1D));
+    m_smFilterMethod->setMapping(rdbNarrowRange2D,     static_cast<int>(FilterMethod::NarrowRangeFilter2D));
+    rdbNarrowRange1D2D->setChecked(true);
 
     ///////////////////////////////////////////////////////////////////////////////
     // num iteration

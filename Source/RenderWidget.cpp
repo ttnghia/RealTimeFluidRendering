@@ -1539,7 +1539,7 @@ void RenderWidget::filterPlaneFitting()
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 void RenderWidget::initRDataNarrowRangeFilter()
 {
-    m_RDataNarrowRangeFilter.shader = ShaderProgram::getScreenQuadShaderFromFile("Shaders/filter-modified-gaussian.fs.glsl", "FilterModifiedGaussian");
+    m_RDataNarrowRangeFilter.shader = ShaderProgram::getScreenQuadShaderFromFile("Shaders/filter-narrow-range.fs.glsl", "FilterNarrowRange");
     m_ExternalShaders.push_back(m_RDataNarrowRangeFilter.shader);
 
     m_RDataNarrowRangeFilter.ub_CamData        = m_RDataNarrowRangeFilter.shader->getUniformBlockIndex("CameraData");

@@ -251,7 +251,7 @@ protected:
     void runDepthFilter();
     ////////////////////////////////////////////////////////////////////////////////
 
-    int m_FilterMethod       = FilterMethod::BilateralGaussian;
+    int m_FilterMethod       = FilterMethod::NarrowRangeFilter1D2D;
     int m_FilterSize         = DEFAULT_FILTER_SIZE;
     int m_NumFilterIteration = DEFAULT_NUM_FILTER_ITERATION;
     ////////////////////////////////////////////////////////////////////////////////

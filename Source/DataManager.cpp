@@ -55,12 +55,6 @@ bool DataManager::setDataPath(QString dataPath)
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-const std::shared_ptr<SimulationDataInfo>& DataManager::getDataInfo() const
-{
-    return m_DataInfo;
-}
-
-//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 bool DataManager::loadDataInfo(QString dataPath)
 {
     QString       fileName = dataPath + "/viz_info.txt";
@@ -256,28 +250,6 @@ bool DataManager::loadDataInfo(QString dataPath)
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-void DataManager::generateStringDataInfo()
-{
-    m_StringDataInfo->clear();
-
-    m_StringDataInfo->append(QString("Num. particles: ") + QString::fromStdString(NumberHelpers::formatWithCommas(m_DataInfo->num_particles)));
-    m_StringDataInfo->append(QString("Max. particles: " + QString::fromStdString(NumberHelpers::formatWithCommas(m_DataInfo->max_num_particles))));
-    m_StringDataInfo->append(QString("Particle radius: %1").arg(m_DataInfo->particle_radius));
-    m_StringDataInfo->append(QString("Particle mass: %1").arg(m_DataInfo->particle_mass));
-
-    m_StringDataInfo->append(QString("Box min: %1, %2, %3").arg(m_DataInfo->boundary_min[0]).arg(m_DataInfo->boundary_min[1]).arg(m_DataInfo->boundary_min[2]));
-    m_StringDataInfo->append(QString("Box max: %1, %2, %3").arg(m_DataInfo->boundary_max[0]).arg(m_DataInfo->boundary_max[1]).arg(m_DataInfo->boundary_max[2]));
-    m_StringDataInfo->append(QString("Grid: %1, %2, %3").arg(m_DataInfo->num_cells[0]).arg(m_DataInfo->num_cells[1]).arg(m_DataInfo->num_cells[2]));
-    m_StringDataInfo->append(QString("Total cells: " + QString::fromStdString(NumberHelpers::formatWithCommas(m_DataInfo->num_cells[3]))));
-}
-
-//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-const std::shared_ptr<QStringList>& DataManager::getStringDataInfo() const
-{
-    return m_StringDataInfo;
-}
-
-//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 void DataManager::countFrames()
 {
     QDir dataDir(m_DataPath);
@@ -294,4 +266,20 @@ void DataManager::countFrames()
 
         emit numFramesChanged(m_NumFrames);
     }
+}
+
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+void DataManager::generateStringDataInfo()
+{
+    m_StringDataInfo->clear();
+
+    m_StringDataInfo->append(QString("Num. particles: ") + QString::fromStdString(NumberHelpers::formatWithCommas(m_DataInfo->num_particles)));
+    m_StringDataInfo->append(QString("Max. particles: " + QString::fromStdString(NumberHelpers::formatWithCommas(m_DataInfo->max_num_particles))));
+    m_StringDataInfo->append(QString("Particle radius: %1").arg(m_DataInfo->particle_radius));
+    m_StringDataInfo->append(QString("Particle mass: %1").arg(m_DataInfo->particle_mass));
+
+    m_StringDataInfo->append(QString("Box min: %1, %2, %3").arg(m_DataInfo->boundary_min[0]).arg(m_DataInfo->boundary_min[1]).arg(m_DataInfo->boundary_min[2]));
+    m_StringDataInfo->append(QString("Box max: %1, %2, %3").arg(m_DataInfo->boundary_max[0]).arg(m_DataInfo->boundary_max[1]).arg(m_DataInfo->boundary_max[2]));
+    m_StringDataInfo->append(QString("Grid: %1, %2, %3").arg(m_DataInfo->num_cells[0]).arg(m_DataInfo->num_cells[1]).arg(m_DataInfo->num_cells[2]));
+    m_StringDataInfo->append(QString("Total cells: " + QString::fromStdString(NumberHelpers::formatWithCommas(m_DataInfo->num_cells[3]))));
 }

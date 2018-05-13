@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include <Banana/Setup.h>
+
 #include <QtWidgets>
 #include <QFileSystemWatcher>
 #include <QList>
@@ -81,12 +83,12 @@ class DataManager : public QObject
     Q_OBJECT
 public:
     DataManager();
-    ~DataManager() = default;
 
-    bool                                       setDataPath(QString dataPath);
-    bool                                       loadDataInfo(QString dataPath);
-    const std::shared_ptr<QStringList>&        getStringDataInfo() const;
-    const std::shared_ptr<SimulationDataInfo>& getDataInfo() const;
+    bool setDataPath(QString dataPath);
+    bool loadDataInfo(QString dataPath);
+
+    const auto& getStringDataInfo() const { return m_StringDataInfo; }
+    const auto& getDataInfo() const { return m_DataInfo; }
 
 private slots:
     void countFrames();
@@ -97,9 +99,9 @@ signals:
 private:
     void generateStringDataInfo();
 
-    int                                 m_NumFrames      = 0;
-    QString                             m_DataPath       = QString("");
-    std::shared_ptr<QStringList>        m_StringDataInfo = std::make_shared<QStringList>();
-    std::shared_ptr<SimulationDataInfo> m_DataInfo       = std::make_shared<SimulationDataInfo>();
-    std::unique_ptr<QFileSystemWatcher> m_DataDirWatcher = std::make_unique<QFileSystemWatcher>();
+    int                           m_NumFrames      = 0;
+    QString                       m_DataPath       = QString("");
+    SharedPtr<QStringList>        m_StringDataInfo = std::make_shared<QStringList>();
+    SharedPtr<SimulationDataInfo> m_DataInfo       = std::make_shared<SimulationDataInfo>();
+    UniquePtr<QFileSystemWatcher> m_DataDirWatcher = std::make_unique<QFileSystemWatcher>();
 };

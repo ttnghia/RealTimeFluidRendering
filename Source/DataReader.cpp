@@ -21,9 +21,10 @@
 
 #include "Common.h"
 #include "DataReader.h"
+#include <Banana/Utils/FileHelpers.h>
 #include <fstream>
 
-#define NEW_DATA 1
+#define NEW_DATA
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 DataReader::DataReader()
@@ -32,21 +33,18 @@ DataReader::DataReader()
                             {
                                 static char buff[512];
                                 __BNN_SPRINT(buff, "%s/%s/%s.%04d.%s", m_DataPath.toStdString().c_str(), "FluidFrame", "frame", fileID, "pos");
-
                                 return std::string(buff);
                             };
     m_GenFluidAniMatrixFileName = [&](int fileID)
                                   {
                                       static char buff[512];
                                       __BNN_SPRINT(buff, "%s/%s/%s.%04d.%s", m_DataPath.toStdString().c_str(), "FluidFrame", "frame", fileID, "ani");
-
                                       return std::string(buff);
                                   };
     m_GenMeshFileName = [&](int fileID)
                         {
                             static char buff[512];
                             __BNN_SPRINT(buff, "%s/%s/%s.%04d.%s", m_DataPath.toStdString().c_str(), "SolidFrame", "frame", fileID, "pos");
-
                             return std::string(buff);
                         };
 
@@ -56,55 +54,25 @@ DataReader::DataReader()
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-DataReader::~DataReader()
-{
-    m_VReadBuffer.clear();
-}
-
-//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-void DataReader::setDataPath(QString dataPath, const std::shared_ptr<SimulationDataInfo>& dataInfo)
+void DataReader::setDataPath(QString dataPath, const SharedPtr<SimulationDataInfo>& dataInfo)
 {
     m_DataPath     = dataPath;
     m_CurrentFrame = 0;
-
     if(m_DataInfo == nullptr) {
         m_DataInfo = dataInfo;
     }
-
     allocateMemory();
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-void DataReader::setNumFrames(int numFrames)
-{
-    m_NumFrames = numFrames;
-
-    if(m_CurrentFrame > numFrames) {
-        readFrame(numFrames);
-    }
-}
-
-//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-void DataReader::enableAnisotropyKernel(bool bAniKernel)
-{
-    m_bUseAnisotropyKernel = bAniKernel;
-}
-
-//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-void DataReader::resetToFirstFrame()
-{
-    readFrame(1);
-}
-
-//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-void DataReader::setParticleDataObj(const std::shared_ptr<ParticleSystemData>& particleData)
+void DataReader::setParticleDataObj(const SharedPtr<ParticleSystemData>& particleData)
 {
     if(m_ParticleData == nullptr) {
         m_ParticleData = particleData;
     }
 }
 
-void DataReader::setMeshObj(const std::vector<std::shared_ptr<MeshObject>>& meshObj)
+void DataReader::setMeshObj(const std::vector<SharedPtr<MeshObject>>& meshObj)
 {
     Q_ASSERT(meshObj.size() > 0);
 
@@ -114,45 +82,12 @@ void DataReader::setMeshObj(const std::vector<std::shared_ptr<MeshObject>>& mesh
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-void DataReader::setDelayTime(int _frameTime)
+void DataReader::setNumFrames(int numFrames)
 {
-    m_DelayTime = _frameTime;
-
-    m_AutoTimer->setInterval(m_DelayTime);
-}
-
-//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-void DataReader::setFrameStep(int frameStep)
-{
-    m_FrameStep = frameStep;
-}
-
-//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-void DataReader::enableRepeat(bool bRepeat)
-{
-    m_bRepeat = bRepeat;
-}
-
-//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-void DataReader::enableReverse(bool bReverse)
-{
-    m_Reverse = bReverse;
-}
-
-//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-void DataReader::pause(bool bPaused)
-{
-    m_bPause = bPaused;
-}
-
-//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-void DataReader::readNextFrameByTimer()
-{
-    if(m_bPause) {
-        return;
+    m_NumFrames = numFrames;
+    if(m_CurrentFrame > numFrames) {
+        readFrame(numFrames);
     }
-
-    readNextFrame();
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -171,18 +106,6 @@ void DataReader::readNextFrame()
     }
 
     readFrame(nextFrame);
-}
-
-//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-void DataReader::allocateMemory()
-{
-    assert(m_ParticleData != nullptr);
-
-    m_ParticleData->addArray<float, 3>("Position");
-    m_ParticleData->addArray<float, 3>("ColorRandom");
-    m_ParticleData->addArray<float, 3>("ColorRamp");
-    m_ParticleData->addArray<float, 9>("AnisotropyKernelMatrix");
-    m_ParticleData->reserve(1000000);
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -226,7 +149,18 @@ void DataReader::readFrame(int frame)
     }
 }
 
-#include <Banana/Utils/FileHelpers.h>
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+void DataReader::allocateMemory()
+{
+    assert(m_ParticleData != nullptr);
+
+    m_ParticleData->addArray<float, 3>("Position");
+    m_ParticleData->addArray<float, 3>("ColorRandom");
+    m_ParticleData->addArray<float, 3>("ColorRamp");
+    m_ParticleData->addArray<float, 9>("AnisotropyKernelMatrix");
+    m_ParticleData->reserve(1000000);
+}
+
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 bool DataReader::readFluidPosition(int frameID)
 {
@@ -251,7 +185,7 @@ bool DataReader::readFluidPosition(int frameID)
     unsigned int numParticles;
     float        particleRadius;
 
-#if NEW_DATA == 1
+#ifdef NEW_DATA
     memcpy(&numParticles,   m_VReadBuffer.data(),                             sizeof(unsigned int));
     memcpy(&particleRadius, &m_VReadBuffer.data()[sizeof(unsigned int)],      sizeof(float));
 #else
@@ -268,7 +202,7 @@ bool DataReader::readFluidPosition(int frameID)
         m_ParticleData->allocate(numParticles);
     }
 
-#if NEW_DATA == 1
+#ifdef NEW_DATA
     memcpy(m_ParticleData->getArray("Position")->data(), &m_VReadBuffer.data()[sizeof(unsigned int) + sizeof(float)], 3 * numParticles * sizeof(float));
 #else
     memcpy(m_ParticleData->getArray("Position")->data(), &m_VReadBuffer.data()[18 * sizeof(unsigned int)],            3 * numParticles * sizeof(float));
@@ -344,7 +278,7 @@ bool DataReader::readMeshes(int frameID)
 
     ////////////////////////////////////////////////////////////////////////////////
     unsigned int numMeshes = 0;
-#if NEW_DATA == 1
+#ifdef NEW_DATA
     memcpy(&numMeshes, m_VReadBuffer.data(), sizeof(unsigned int));
 
     for(int i = numMeshes; i < m_DataInfo->num_meshes; ++i) {
