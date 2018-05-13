@@ -29,7 +29,7 @@ Firstly, one need to download and extract the provided datasets. For loading dat
 Then, using program for rendering particle data is very straighforward.
 
 ### Textures
-Skybox textures and floor textures are loaded from disk automatically at launching time. Users can modify textures to their own in the Textures folder. Note that each skybox texture need to be put in a separate subfolder while all floor textures are put in the same folder.
+Skybox textures and floor textures are loaded from disk automatically at launching time. Users can modify textures to their own in the Textures folder. Note that each skybox texture needs to be put in a separate subfolder while all floor textures are put in the same folder.
 
 ### Data Format
 
@@ -60,7 +60,7 @@ Next (4 x 9 x numParticles) bytes: array of 3x3 matrices (anisotropic kernels)
 ```
 
 
-**SolidFrame/frame.%4d.pos** files contain triangle mesh objects, which have the following format:
+**SolidFrame/frame.%4d.pos** files contain triangle mesh objects in the following format:
 ```
 BYTE 0-3(unsigned int): number of meshes
 For each mesh i in numMeshes:
