@@ -300,35 +300,36 @@ void RenderWidget::initParticleDataObj()
     Q_ASSERT(m_ParticleData != nullptr);
     m_ParticleData->setUInt("DataFrame",     0);
     m_ParticleData->setUInt("FrameExported", 0);
+    m_ParticleData->addArray<float, 3>("Position");
 
-    const int     sizeXYZ = 20;
-    const GLfloat step    = 2.0 / static_cast<GLfloat>(sizeXYZ - 1);
+    const int   sizeXYZ        = 20;
+    const float step           = 2.0f / static_cast<float>(sizeXYZ - 1);
+    const float particleRadius = 0.5f * step;
+    const float randomness     = particleRadius * 0.3f;
+    const auto  corner         = Vec3f(-1, 0, -1);
+
     m_ParticleData->setNumParticles(sizeXYZ * sizeXYZ * sizeXYZ);
-    m_ParticleData->setParticleRadius(0.5 * step * 0.95);
+    m_ParticleData->setParticleRadius(particleRadius);
+    auto dataPtr = reinterpret_cast<Vec3f*>(m_ParticleData->getArray("Position")->data());
 
-    m_ParticleData->addArray<GLfloat, 3>("Position");
-    GLfloat*      dataPtr    = reinterpret_cast<GLfloat*>(m_ParticleData->getArray("Position")->data());
-    int           p          = 0;
-    const GLfloat randomness = 0.5;
-
+    int p = 0;
+    srand(time(0));
     for(int i = 0; i < sizeXYZ; ++i) {
         for(int j = 0; j < sizeXYZ; ++j) {
             for(int k = 0; k < sizeXYZ; ++k) {
-                dataPtr[p++] = -1.0 + static_cast<GLfloat>(i) * step + ((float)rand() / RAND_MAX * 2 - 1) * m_ParticleData->getParticleRadius<float>() * randomness;
-                dataPtr[p++] = 0.0 + static_cast<GLfloat>(j) * step + ((float)rand() / RAND_MAX * 2 - 1) * m_ParticleData->getParticleRadius<float>() * randomness;
-                dataPtr[p++] = -1.0 + static_cast<GLfloat>(k) * step + ((float)rand() / RAND_MAX * 2 - 1) * m_ParticleData->getParticleRadius<float>() * randomness;
+                auto pos = corner + Vec3f(i, j, k) * step;
+                NumberHelpers::jitter(pos, randomness);
+                dataPtr[p++] = pos;
             }
         }
     }
+    computeParticleAnisotropyKernel();
+    m_ParticleData->setUInt("AnisotrpyMatrixReady", 1);
 
     m_ParticleData->addArray<GLfloat, 3>("ColorRandom");
     m_ParticleData->addArray<GLfloat, 3>("ColorRamp");
     m_ParticleData->setUInt("ColorRandomReady", 0);
     m_ParticleData->setUInt("ColorRampReady",   0);
-
-    computeParticleAnisotropyKernel();
-    m_ParticleData->setUInt("AnisotrpyMatrixReady", 1);
-
     updateParticleData();
 }
 
@@ -439,11 +440,9 @@ void RenderWidget::computeParticleAnisotropyKernel()
 void RenderWidget::updateMeshes()
 {
     makeCurrent();
-
     for(auto& mesh : m_MeshObjs) {
         mesh->uploadDataToGPU();
     }
-
     doneCurrent();
 }
 
@@ -481,8 +480,8 @@ void RenderWidget::initRDataMeshes()
     Q_ASSERT(m_UBufferCamData != nullptr && m_Lights != nullptr);
 
     for(int i = 0; i < MAX_NUM_MESHES; ++i) {
-        std::shared_ptr<MeshObject>   mesh       = std::make_shared<MeshObject>();;
-        std::unique_ptr<FRMeshRender> meshRender = std::make_unique<FRMeshRender>(mesh, m_Camera, m_Lights, nullptr, m_UBufferCamData);
+        auto mesh       = std::make_shared<MeshObject>();;
+        auto meshRender = std::make_unique<FRMeshRender>(mesh, m_Camera, m_Lights, nullptr, m_UBufferCamData);
         m_ExternalShaders.push_back(meshRender->getShader());
 
         meshRender->getMaterial()->setMaterial(DEFAULT_MESH_MATERIAL);
@@ -765,8 +764,8 @@ void RenderWidget::generateSolidLightDepthMaps()
     //    if(m_NumMeshes == 0)
     //        return;
 
-    assert(m_RDataSolidLightDepthMap.initialized);
-    assert(m_RDataSolidLightDepthMap.depthMapRenders.size() != 0);
+    Q_ASSERT(m_RDataSolidLightDepthMap.initialized);
+    Q_ASSERT(m_RDataSolidLightDepthMap.depthMapRenders.size() != 0);
 
     m_RDataSolidLightDepthMap.shader->bind();
     m_RDataSolidLightDepthMap.bufferModelMatrix->bindBufferBase();
@@ -797,8 +796,7 @@ void RenderWidget::renderSolidCameraDepthMap()
     if(m_NumMeshes == 0) {
         return;
     }
-
-    assert(m_RDataSolidCameraDepthMap.initialized);
+    Q_ASSERT(m_RDataSolidCameraDepthMap.initialized);
 
     m_RDataSolidCameraDepthMap.shader->bind();
     m_RDataSolidLightDepthMap.bufferModelMatrix->bindBufferBase();
@@ -846,7 +844,7 @@ void RenderWidget::initRDataScreenQuadTexRender()
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-void RenderWidget::renderScreenQuadTex(const std::shared_ptr<OpenGLTexture>& texture, int texelSize /*= 1*/, float scaleValue /*= 1.0*/)
+void RenderWidget::renderScreenQuadTex(const SharedPtr<OpenGLTexture>& texture, int texelSize /*= 1*/, float scaleValue /*= 1.0*/)
 {
     Q_ASSERT(m_ScreenQuadTexRender != nullptr);
 
@@ -1093,12 +1091,8 @@ void RenderWidget::initRDataThicknessFilter()
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 void RenderWidget::filterThickness()
 {
-    return;
-    __BNN_TODO_MSG("Should we filter thickness?");
-    ////////////////////////////////////////////////////////////////////////////////
     Q_ASSERT(m_RDataFilterThickness.initialized);
     Q_ASSERT(m_RDataCompositionPass.thicknessTex != nullptr);
-
     ////////////////////////////////////////////////////////////////////////////////
     m_RDataFilterThickness.shader->bind();
     m_RDataFilterThickness.shader->setUniformValue(m_RDataFilterThickness.u_ThicknessTex, 0);
@@ -1387,7 +1381,6 @@ void RenderWidget::filterBiGaussian()
     Q_ASSERT(m_RDataFilterBiGaussian.initialized);
     Q_ASSERT(m_FilterFrameBuffer != nullptr);
     Q_ASSERT(m_RDataCompositionPass.depthTex != nullptr);
-
     ////////////////////////////////////////////////////////////////////////////////
     m_RDataFilterBiGaussian.shader->bind();
     m_RDataFilterBiGaussian.shader->setUniformValue(m_RDataFilterBiGaussian.u_DepthTex,       0);
@@ -1441,7 +1434,6 @@ void RenderWidget::filterCurvatureFlow()
     Q_ASSERT(m_RDataFilterCurvatureFlow.initialized);
     Q_ASSERT(m_FilterFrameBuffer != nullptr);
     Q_ASSERT(m_RDataCompositionPass.depthTex != nullptr);
-
     ////////////////////////////////////////////////////////////////////////////////
     m_RDataFilterCurvatureFlow.shader->bind();
     m_UBufferCamData->bindBufferBase();
@@ -1498,7 +1490,6 @@ void RenderWidget::filterPlaneFitting()
     Q_ASSERT(m_RDataFilterPlaneFitting.initialized);
     Q_ASSERT(m_FilterFrameBuffer != nullptr);
     Q_ASSERT(m_RDataCompositionPass.depthTex != nullptr);
-
     ////////////////////////////////////////////////////////////////////////////////
     m_RDataFilterPlaneFitting.shader->bind();
     m_UBufferCamData->bindBufferBase();
@@ -1553,7 +1544,6 @@ void RenderWidget::initRDataNarrowRangeFilter()
     m_RDataNarrowRangeFilter.u_DoFilter1D      = m_RDataNarrowRangeFilter.shader->getUniformLocation("u_DoFilter1D");
 
     glCall(glGenVertexArrays(1, &m_RDataNarrowRangeFilter.VAO));
-
     m_RDataNarrowRangeFilter.initialized = true;
 }
 
@@ -1561,10 +1551,8 @@ void RenderWidget::initRDataNarrowRangeFilter()
 void RenderWidget::filterNarrowRange()
 {
     Q_ASSERT(m_RDataNarrowRangeFilter.initialized);
-
     Q_ASSERT(m_FilterFrameBuffer != nullptr);
     Q_ASSERT(m_RDataCompositionPass.depthTex != nullptr);
-
     ////////////////////////////////////////////////////////////////////////////////
     m_RDataNarrowRangeFilter.shader->bind();
     m_UBufferCamData->bindBufferBase();
@@ -1580,7 +1568,6 @@ void RenderWidget::filterNarrowRange()
     glCall(glClearColor(CLEAR_DEPTH_VALUE, CLEAR_DEPTH_VALUE, CLEAR_DEPTH_VALUE, 1.0));
     glCall(glBindVertexArray(m_RDataNarrowRangeFilter.VAO));
     m_FilterFrameBuffer->beginRender();
-
     ////////////////////////////////////////////////////////////////////////////////
     if(m_FilterMethod == FilterMethod::NarrowRangeFilter2D) {
         m_RDataNarrowRangeFilter.shader->setUniformValue(m_RDataNarrowRangeFilter.u_DoFilter1D, 0);

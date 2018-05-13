@@ -31,7 +31,6 @@ include($$BANANA_DIR/BananaCore/BananaCore.pri)
 include($$BANANA_DIR/QtAppHelpers/QtAppHelpers.pri)
 include($$BANANA_DIR/OpenGLHelpers/OpenGLHelpers.pri)
 include($$BANANA_DIR/Simulation/Simulation.pri)
-QMAKE_LFLAGS -= /WHOLEARCHIVE:Simulation.lib
 
 INCLUDEPATH += $$PWD/Source
 
