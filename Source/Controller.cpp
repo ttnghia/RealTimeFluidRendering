@@ -355,7 +355,6 @@ void Controller::setupButtons()
 
     ////////////////////////////////////////////////////////////////////////////////
     /// other buttons
-
     m_btnReset   = new QPushButton(QString("Reset"));
     m_btnReverse = new QPushButton(QString("Reverse"));
     m_btnReverse->setCheckable(true);

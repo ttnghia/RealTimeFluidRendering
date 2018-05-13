@@ -25,16 +25,15 @@
 void FRMeshRender::render(bool bRenderShadow, bool bVisualizeShadowRegion, float shadowIntensity)
 {
     assert(m_MeshObj != nullptr && m_Camera != nullptr && m_UBufferCamData != nullptr);
-
     if(m_MeshObj->isEmpty()) {
         return;
     }
 
     if(m_SelfUpdateCamera) {
         m_Camera->updateCameraMatrices();
-        m_UBufferCamData->uploadData(glm::value_ptr(m_Camera->getViewMatrix()),            0,                     sizeof(glm::mat4));
-        m_UBufferCamData->uploadData(glm::value_ptr(m_Camera->getProjectionMatrix()), sizeof(glm::mat4),          sizeof(glm::mat4));
-        m_UBufferCamData->uploadData(glm::value_ptr(m_Camera->getCameraPosition()),        5 * sizeof(glm::mat4), sizeof(glm::vec3));
+        m_UBufferCamData->uploadData(glm::value_ptr(m_Camera->getViewMatrix()),            0,                   sizeof(Mat4x4f));
+        m_UBufferCamData->uploadData(glm::value_ptr(m_Camera->getProjectionMatrix()), sizeof(Mat4x4f),          sizeof(Mat4x4f));
+        m_UBufferCamData->uploadData(glm::value_ptr(m_Camera->getCameraPosition()),        5 * sizeof(Mat4x4f), sizeof(Vec3f));
     }
 
     m_Shader->bind();
@@ -104,22 +103,6 @@ void FRMeshRender::render(bool bRenderShadow, bool bVisualizeShadowRegion, float
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-void FRMeshRender::setSolidShadowMaps(const std::vector<std::shared_ptr<OpenGLTexture>>& shadowMaps)
-{
-    m_SolidShadowMaps = shadowMaps;
-}
-
-void FRMeshRender::setFluidShadowMaps(const std::vector<std::shared_ptr<OpenGLTexture>>& shadowMaps)
-{
-    m_FluidShadowMaps = shadowMaps;
-}
-
-void FRMeshRender::setFluidShadowThickness(const std::vector<std::shared_ptr<OpenGLTexture>>& shadowThickness)
-{
-    m_FluidShadowThickness = shadowThickness;
-}
-
-//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 void FRMeshRender::initRenderData()
 {
     ////////////////////////////////////////////////////////////////////////////////
@@ -166,7 +149,6 @@ void FRPlaneRender::render(bool bRenderShadow, bool bVisualizeShadowRegion, floa
     if(m_CurrentTexture == nullptr) {
         return;
     }
-
     FRMeshRender::render(bRenderShadow, bVisualizeShadowRegion, shadowIntensity);
 }
 
@@ -174,7 +156,6 @@ void FRPlaneRender::render(bool bRenderShadow, bool bVisualizeShadowRegion, floa
 void FRPlaneRender::scaleTexCoord(int scaleX, int scaleY)
 {
     GridObject* gridObj = static_cast<GridObject*>(m_MeshObj.get());
-
     assert(gridObj != nullptr);
     gridObj->scaleTexCoord(scaleX, scaleY);
     gridObj->uploadDataToGPU();

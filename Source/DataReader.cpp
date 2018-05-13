@@ -163,7 +163,6 @@ bool DataReader::readFluidPosition(int frameID)
     m_ReadTimer.tick();
     size_t fileSize = (size_t)file.tellg();
     m_VReadBuffer.resize(fileSize);
-
     file.seekg(0, std::ios::beg);
     file.read((char*)m_VReadBuffer.data(), fileSize);
     file.close();
@@ -205,7 +204,6 @@ bool DataReader::readFluidAnisotropyKernel(int frameID)
     m_ReadTimer.tick();
     size_t fileSize = (size_t)file.tellg();
     m_VReadBuffer.resize(fileSize);
-
     file.seekg(0, std::ios::beg);
     file.read((char*)m_VReadBuffer.data(), fileSize);
     file.close();
@@ -236,7 +234,6 @@ bool DataReader::readMeshes(int frameID)
     m_ReadTimer.tick();
     size_t fileSize = (size_t)file.tellg();
     m_VReadBuffer.resize(fileSize);
-
     file.seekg(0, std::ios::beg);
     file.read((char*)m_VReadBuffer.data(), fileSize);
     file.close();
