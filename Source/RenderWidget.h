@@ -84,7 +84,6 @@ protected:
     void initRDataParticle();
     void initParticleDataObj();
     void initParticleVAOs();
-    void uploadParticleColorData();
     void renderParticles();
     void computeParticleAnisotropyKernel();
 
@@ -103,14 +102,13 @@ protected:
         GLint  v_AnisotropyMatrix0;
         GLint  v_AnisotropyMatrix1;
         GLint  v_AnisotropyMatrix2;
-        GLint  v_Color;
         GLuint ub_CamData;
         GLuint ub_Light;
         GLuint ub_Material;
+        GLuint u_nParticles;
+        GLuint u_ColorMode;
         GLuint u_PointRadius;
         GLuint u_ClipPlane;
-        GLuint u_IsPointView;
-        GLuint u_HasVColor;
         GLuint u_UseAnisotropyKernel;
         GLuint u_ScreenWidth;
         GLuint u_ScreenHeight;
@@ -119,8 +117,7 @@ protected:
         GLfloat pointRadius;
 
         GLint isPointView         = 0;
-        GLint hasVColor           = 1;
-        GLint pColorMode          = ParticleColorMode::Random;
+        GLint pColorMode          = static_cast<int>(ParticleColorMode::Random);
         GLint useAnisotropyKernel = 1;
         bool  initialized         = false;
     } m_RDataParticle;

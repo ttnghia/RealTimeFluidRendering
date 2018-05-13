@@ -51,7 +51,6 @@ uniform uint  u_nParticles;
 uniform int   u_ColorMode;
 uniform vec4  u_ClipPlane;
 uniform float u_PointRadius;
-uniform int   u_IsPointView;
 uniform int   u_UseAnisotropyKernel;
 uniform int   u_ScreenWidth;
 uniform int   u_ScreenHeight;
@@ -165,11 +164,7 @@ void main()
     }
 #endif
 
-    if(u_IsPointView == 1) {
-        gl_PointSize = 2.0;
-    } else {
-        ComputePointSizeAndPosition(T);
-    }
+    ComputePointSizeAndPosition(T);
 
     //    if(u_PointScale < 0)
     //        eyeCoord *= 2;

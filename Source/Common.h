@@ -95,7 +95,6 @@ public:
         Uniform = 0,
         Random,
         Ramp,
-        FromData,
         NumColorMode
     };
 };

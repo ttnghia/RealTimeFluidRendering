@@ -133,8 +133,6 @@ void DataReader::readFrame(int frame)
 
         if(m_DataInfo->num_particles != m_ParticleData->getNParticles()) {
             m_ParticleData->setNumParticles(m_DataInfo->num_particles);
-            m_ParticleData->setUInt("ColorRandomReady", 0);
-            m_ParticleData->setUInt("ColorRampReady",   0);
             emit numParticlesChanged(m_DataInfo->num_particles);
         }
     }
@@ -145,8 +143,6 @@ void DataReader::allocateMemory()
 {
     Q_ASSERT(m_ParticleData != nullptr);
     m_ParticleData->addArray<float, 3>("Position");
-    m_ParticleData->addArray<float, 3>("ColorRandom");
-    m_ParticleData->addArray<float, 3>("ColorRamp");
     m_ParticleData->addArray<float, 9>("AnisotropyKernelMatrix");
     m_ParticleData->reserve(1024);
 }
