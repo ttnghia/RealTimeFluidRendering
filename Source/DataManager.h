@@ -57,24 +57,24 @@ struct SimulationDataInfo
         hasLightInfo  = false;
     }
 
-    int   num_particles;
-    int   max_num_particles;
+    Int   num_particles;
+    Int   max_num_particles;
     float particle_radius;
     float particle_mass;
-    int   num_meshes;
+    Int   num_meshes;
 
-    std::array<float, 3> boundary_min;
-    std::array<float, 3> boundary_max;
-    std::array<float, 3> movable_min;
-    std::array<float, 3> movable_max;
+    Vec3f boundary_min;
+    Vec3f boundary_max;
+    Vec3f movable_min;
+    Vec3f movable_max;
 
-    std::array<int, 4> num_cells;
+    Vec4i num_cells;
 
-    bool                 hasCameraInfo;
-    bool                 hasLightInfo;
-    std::array<float, 3> camera_position;
-    std::array<float, 3> camera_focus;
-    std::array<float, 3> light_position;
+    bool  hasCameraInfo;
+    bool  hasLightInfo;
+    Vec3f camera_position;
+    Vec3f camera_focus;
+    Vec3f light_position;
 };
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -99,7 +99,7 @@ signals:
 private:
     void generateStringDataInfo();
 
-    int                           m_NumFrames      = 0;
+    Int                           m_NumFrames      = 0;
     QString                       m_DataPath       = QString("");
     SharedPtr<QStringList>        m_StringDataInfo = std::make_shared<QStringList>();
     SharedPtr<SimulationDataInfo> m_DataInfo       = std::make_shared<SimulationDataInfo>();

@@ -61,12 +61,11 @@ public:
 
 protected:
     virtual void initRenderData() override;
-
+    ////////////////////////////////////////////////////////////////////////////////
     Vector<SharedPtr<OpenGLTexture>> m_SolidShadowMaps;
     Vector<SharedPtr<OpenGLTexture>> m_FluidShadowMaps;
     Vector<SharedPtr<OpenGLTexture>> m_FluidShadowThickness;
 
-    ////////////////////////////////////////////////////////////////////////////////
     GLuint m_USolidShadowMaps[MAX_NUM_LIGHTS];
     GLuint m_UFluidShadowMaps[MAX_NUM_LIGHTS];
     GLuint m_UFluidShadowThickness[MAX_NUM_LIGHTS];

@@ -259,7 +259,7 @@ void DataManager::countFrames()
     dataDir.setFilter(QDir::NoDotAndDotDot | QDir::AllEntries);
     dataDir.setNameFilters(QStringList() << "*.pos");
 
-    int numFiles = dataDir.entryList().count();
+    Int numFiles = dataDir.entryList().count();
 
     if(m_NumFrames != numFiles) {
         m_NumFrames = numFiles;

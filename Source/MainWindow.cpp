@@ -60,8 +60,8 @@ bool MainWindow::processKeyPressEvent(QKeyEvent* event)
             m_OutputPath->browse();
             return true;
 
-        //    case Qt::Key_C:
-        //        renderer->resetCameraPosition();
+        case Qt::Key_C:
+            m_RenderWidget->resetCameraPosition();
 
         case Qt::Key_R:
             m_Controller->m_btnReverse->click();
@@ -109,8 +109,10 @@ void MainWindow::showEvent(QShowEvent* ev)
     if(m_DataList->getListSize() > 0) {
         QTimer::singleShot(100, this, [&]()
                            {
+                               m_DataList->resize(500, 400);
                                m_DataList->show();
-                               m_DataList->setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignBottom | Qt::AlignRight, m_DataList->size(), qApp->desktop()->availableGeometry()));
+                               m_DataList->setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignBottom | Qt::AlignRight,
+                                                                           m_DataList->size(), qApp->desktop()->availableGeometry()));
                            });
     }
 }
@@ -142,7 +144,6 @@ void MainWindow::updateNumFrames(int numFrames)
 {
     m_DataReader->setNumFrames(numFrames);
     m_sldFrame->setRange(1, numFrames);
-
     ////////////////////////////////////////////////////////////////////////////////
     m_lblStatusNumFrames->setText(QString("Total frame: %1").arg(numFrames));
 }
@@ -157,7 +158,7 @@ void MainWindow::updateStatusReadInfo(double readTime, size_t bytes)
 void MainWindow::loadDataInfo(QString dataPath)
 {
     if(m_DataManager->setDataPath(dataPath)) {
-        assert(m_RenderWidget != nullptr);
+        Q_ASSERT(m_RenderWidget != nullptr);
         m_OutputPath->setPath(dataPath);
         m_DataReader->setParticleDataObj(m_RenderWidget->getParticleDataObj());
         m_DataReader->setMeshObj(m_RenderWidget->getMeshObjs());
@@ -165,22 +166,20 @@ void MainWindow::loadDataInfo(QString dataPath)
         m_RenderWidget->getParticleDataObj()->resize(0);
         m_RenderWidget->updateNumMeshes(0);
 
-        const std::shared_ptr<SimulationDataInfo>& dataInfo = m_DataManager->getDataInfo();
+        const auto& dataInfo = m_DataManager->getDataInfo();
         m_DataReader->setDataPath(dataPath, dataInfo);
 
-        m_RenderWidget->setBox(glm::vec3(dataInfo->movable_min[0], dataInfo->movable_min[1], dataInfo->movable_min[2]),
-                               glm::vec3(dataInfo->movable_max[0], dataInfo->movable_max[1], dataInfo->movable_max[2]));
+        m_RenderWidget->setBox(dataInfo->movable_min, dataInfo->movable_max);
 
         if(dataInfo->hasCameraInfo) {
-            m_RenderWidget->setCamera(glm::vec3(dataInfo->camera_position[0], dataInfo->camera_position[1], dataInfo->camera_position[2]),
-                                      glm::vec3(dataInfo->camera_focus[0], dataInfo->camera_focus[1], dataInfo->camera_focus[2]));
+            m_RenderWidget->setCamera(dataInfo->camera_position, dataInfo->camera_focus);
         } else {
             m_RenderWidget->setCamera(DEFAULT_CAMERA_POSITION, DEFAULT_CAMERA_FOCUS);
         }
 
         if(dataInfo->hasLightInfo) {
             Vector<PointLights::PointLightData> lights(1);
-            lights.front().position = Vec4f(dataInfo->light_position[0], dataInfo->light_position[1], dataInfo->light_position[2], 1.0);
+            lights.front().position = Vec4f(dataInfo->light_position, 1.0);
             m_RenderWidget->setLights(lights);
             m_Controller->m_LightEditor->lightToGUI();
         }
@@ -200,7 +199,7 @@ void MainWindow::setupRenderWidgets()
 
     ////////////////////////////////////////////////////////////////////////////////
     QHBoxLayout* inputOutputLayout = new QHBoxLayout;
-    setupDataWidgets(inputOutputLayout);
+    setupDataPathWidgets(inputOutputLayout);
 
     ////////////////////////////////////////////////////////////////////////////////
     // setup layouts
@@ -223,7 +222,7 @@ void MainWindow::setupRenderWidgets()
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 void MainWindow::setupPlayList()
 {
-    assert(m_DataList != nullptr);
+    Q_ASSERT(m_DataList != nullptr);
     m_DataList->setWindowTitle("Simulation List");
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -237,7 +236,7 @@ void MainWindow::setupPlayList()
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-void MainWindow::setupDataWidgets(QLayout* dataLayout)
+void MainWindow::setupDataPathWidgets(QLayout* dataLayout)
 {
     ////////////////////////////////////////////////////////////////////////////////
     // input data path
@@ -245,18 +244,18 @@ void MainWindow::setupDataWidgets(QLayout* dataLayout)
 
     ////////////////////////////////////////////////////////////////////////////////
     // output image path
-    m_chkExportFrame = new QCheckBox("Capture OpenGL Window");
-    m_OutputPath     = new BrowsePathWidget(QIcon(":/Icons/save.png"));
+    m_chkCaptureFrame = new QCheckBox("Capture OpenGL Window");
+    m_OutputPath      = new BrowsePathWidget(QIcon(":/Icons/save.png"));
 
-    QHBoxLayout* exportImageLayout = new QHBoxLayout;
-    exportImageLayout->addWidget(m_chkExportFrame);
-    exportImageLayout->addLayout(m_OutputPath->getLayout());
+    QHBoxLayout* layoutCaptureFrame = new QHBoxLayout;
+    layoutCaptureFrame->addWidget(m_chkCaptureFrame);
+    layoutCaptureFrame->addLayout(m_OutputPath->getLayout());
 
     QGroupBox* grExportImage = new QGroupBox("Image Output Path");
-    grExportImage->setLayout(exportImageLayout);
+    grExportImage->setLayout(layoutCaptureFrame);
 
     ////////////////////////////////////////////////////////////////////////////////
-    dataLayout->addWidget(m_InputPath->getGroupBox("Input Path"));
+    dataLayout->addWidget(m_InputPath->getGroupBox("Data Path"));
     dataLayout->addWidget(grExportImage);
 }
 
@@ -283,11 +282,13 @@ void MainWindow::setupStatusBar()
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 void MainWindow::connectWidgets()
 {
-    connect(m_Controller->m_chkUseAnisotropyKernel,     SIGNAL(toggled(bool)),     m_DataReader.get(), SLOT(enableAnisotropyKernel(bool)));
+    connect(m_Controller->m_chkUseAnisotropyKernel, SIGNAL(toggled(bool)), m_DataReader.get(), SLOT(enableAnisotropyKernel(bool)));
+
     ////////////////////////////////////////////////////////////////////////////////
     // playback  params
     connect(m_Controller->m_sldFrameDelay->getSlider(), SIGNAL(valueChanged(int)), m_DataReader.get(), SLOT(setDelayTime(int)));
     connect(m_Controller->m_sldFrameStep->getSlider(),  SIGNAL(valueChanged(int)), m_DataReader.get(), SLOT(setFrameStep(int)));
+    ////////////////////////////////////////////////////////////////////////////////
 
     ////////////////////////////////////////////////////////////////////////////////
     // buttons
@@ -311,7 +312,7 @@ void MainWindow::connectWidgets()
     connect(m_DataManager.get(),     SIGNAL(numFramesChanged(int)),           this,               SLOT(updateNumFrames(int)));
     connect(m_DataManager.get(),     SIGNAL(numFramesChanged(int)),           m_DataReader.get(), SLOT(setNumFrames(int)));
     connect(m_InputPath,             SIGNAL(pathChanged(QString)),            this,               SLOT(loadDataInfo(QString)));
-    connect(m_chkExportFrame,        &QCheckBox::toggled,                     m_RenderWidget,     &RenderWidget::enableExportFrame);
+    connect(m_chkCaptureFrame,       &QCheckBox::toggled,                     m_RenderWidget,     &RenderWidget::enableExportFrame);
 
     connect(m_DataReader.get(),      SIGNAL(currentFrameChanged(int)),        this,               SLOT(updateStatusCurrentFrame(int)));
     connect(m_DataReader.get(),      SIGNAL(currentFrameChanged(int)),        m_sldFrame,         SLOT(setValue(int)));
@@ -329,4 +330,5 @@ void MainWindow::connectWidgets()
     connect(m_DataList.get(),        SIGNAL(currentTextChanged(QString)),     m_InputPath,        SLOT(setPath(QString)));
 
     connect(m_ClipPlaneEditor.get(), SIGNAL(clipPlaneChanged(Vec4f)),         m_RenderWidget,     SLOT(setClipPlane(Vec4f)));
+    ////////////////////////////////////////////////////////////////////////////////
 }

@@ -60,25 +60,25 @@ public slots:
 private:
     void setupRenderWidgets();
     void setupPlayList();
-    void setupDataWidgets(QLayout* dataLayout);
+    void setupDataPathWidgets(QLayout* dataLayout);
     void setupStatusBar();
     void connectWidgets();
 
     ////////////////////////////////////////////////////////////////////////////////
-    RenderWidget*     m_RenderWidget   = nullptr;
-    Controller*       m_Controller     = nullptr;
-    QSlider*          m_sldFrame       = nullptr;
-    QCheckBox*        m_chkExportFrame = nullptr;
-    BrowsePathWidget* m_InputPath      = nullptr;
-    BrowsePathWidget* m_OutputPath     = nullptr;
+    RenderWidget*     m_RenderWidget    = nullptr;
+    Controller*       m_Controller      = nullptr;
+    QSlider*          m_sldFrame        = nullptr;
+    QCheckBox*        m_chkCaptureFrame = nullptr;
+    BrowsePathWidget* m_InputPath       = nullptr;
+    BrowsePathWidget* m_OutputPath      = nullptr;
 
     QLabel* m_lblStatusNumParticles = nullptr;
     QLabel* m_lblStatusCurrentFrame = nullptr;
     QLabel* m_lblStatusNumFrames    = nullptr;
     QLabel* m_lblStatusReadInfo     = nullptr;
 
-    std::unique_ptr<ClipPlaneEditor> m_ClipPlaneEditor = std::make_unique<ClipPlaneEditor>();
-    std::unique_ptr<DataManager>     m_DataManager     = std::make_unique<DataManager>();
-    std::unique_ptr<DataReader>      m_DataReader      = std::make_unique<DataReader>();
-    std::unique_ptr<DataList>        m_DataList        = std::make_unique<DataList>(nullptr, true, true);
+    UniquePtr<ClipPlaneEditor> m_ClipPlaneEditor = std::make_unique<ClipPlaneEditor>();
+    UniquePtr<DataManager>     m_DataManager     = std::make_unique<DataManager>();
+    UniquePtr<DataReader>      m_DataReader      = std::make_unique<DataReader>();
+    UniquePtr<DataList>        m_DataList        = std::make_unique<DataList>(nullptr, true, true);
 };
