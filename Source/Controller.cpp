@@ -26,110 +26,68 @@
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 void Controller::setupGUI()
 {
-    QVBoxLayout* controlLayout = new QVBoxLayout;
-    QVBoxLayout* btnLayout     = new QVBoxLayout;
-
-    setupTextureControllers(controlLayout);
-    setupFrameControllers(controlLayout);
-    setupFluidRenderModeControllers(controlLayout);
-    setupColorControllers(controlLayout);
-    setupShadowControllers(controlLayout);
-    setupFilterControllers(controlLayout);
-
-    setupButtons(btnLayout);
-
-    ////////////////////////////////////////////////////////////////////////////////
-    m_LightEditor = new PointLightEditor(nullptr, this);
-    QWidget* mainControls = new QWidget;
-    mainControls->setLayout(controlLayout);
-
-    QTabWidget* tabWidget = new QTabWidget;
-    tabWidget->setTabPosition(QTabWidget::South);
-    tabWidget->setTabShape(QTabWidget::Triangular);
-    tabWidget->addTab(mainControls,  "Main Controls");
-    tabWidget->addTab(m_LightEditor, "Lights");
-
-    QVBoxLayout* mainLayout = new QVBoxLayout;
-    mainLayout->addWidget(tabWidget);
-    mainLayout->addStretch();
-    mainLayout->addLayout(btnLayout);
-    setLayout(mainLayout);
-
-    ////////////////////////////////////////////////////////////////////////////////
-    //    setLayout(controlLayout);
-    setFixedWidth(350);
+    setupPlaybackControllers();
+    setupFluidRenderModeControllers();
+    setupRenderMaterialControllers();
+    setupShadowControllers();
+    setupFilterControllers();
+    setupButtons();
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-void Controller::loadTextures()
+void Controller::connectWidgets()
 {
     ////////////////////////////////////////////////////////////////////////////////
-    // sky textures
-    int currentSkyTexID = m_cbSkyTexture->getComboBox()->currentIndex();
-    m_cbSkyTexture->getComboBox()->clear();
-    m_cbSkyTexture->getComboBox()->addItem("None");
-    auto skyTexFolders = QtAppUtils::getTextureFolders("Sky");
-    foreach(QString tex, skyTexFolders) {
-        m_cbSkyTexture->getComboBox()->addItem(tex);
-    }
-    m_cbSkyTexture->getComboBox()->setCurrentIndex(currentSkyTexID > 0 ? currentSkyTexID : 0);
+    // textures
+    connect(m_cbFloorTexture->getComboBox(), SIGNAL(currentIndexChanged(int)), m_RenderWidget, SLOT(setFluidFloorTexture(int)));
+    connect(m_sldFloorSize->getSlider(),     &QSlider::valueChanged,           m_RenderWidget, &RenderWidget::setFluidFloorSize);
+    connect(m_sldFloorExposure->getSlider(), &QSlider::valueChanged,           m_RenderWidget, &RenderWidget::setFluidFloorExposure);
+    ////////////////////////////////////////////////////////////////////////////////
 
     ////////////////////////////////////////////////////////////////////////////////
-    // floor textures
-    int currentFloorTexID = m_cbFloorTexture->getComboBox()->currentIndex();
-    m_cbFloorTexture->getComboBox()->clear();
-    m_cbFloorTexture->getComboBox()->addItem("None");
-    auto floorTexFolders = QtAppUtils::getTextureFiles("Floor");
-    foreach(QString tex, floorTexFolders) {
-        m_cbFloorTexture->getComboBox()->addItem(tex);
-    }
+    // render modes/colors
+    connect(m_smFluidRenderMode,      SIGNAL(mapped(int)),                             m_RenderWidget, SLOT(setParticleRenderMode(int)));
+    connect(m_chkUseAnisotropyKernel, SIGNAL(toggled(bool)),                           m_RenderWidget, SLOT(enableAnisotropyKernel(bool)));
+    connect(m_smParticleColorMode,    SIGNAL(mapped(int)),                             m_RenderWidget, SLOT(setParticleColorMode(int)));
 
-    m_cbFloorTexture->getComboBox()->setCurrentIndex(currentFloorTexID > 0 ? currentFloorTexID : 0);
+    connect(m_msParticleMaterial,     SIGNAL(materialChanged(Material::MaterialData)), m_RenderWidget, SLOT(setParticleMaterial(Material::MaterialData)));
+    connect(m_msFluidViewMaterial,    SIGNAL(materialChanged(Material::MaterialData)), m_RenderWidget, SLOT(setFluidViewMaterial(Material::MaterialData)));
+    connect(m_msMeshMaterial,         &MaterialSelector::materialChanged,              [&](const Material::MaterialData& material)
+            {
+                m_RenderWidget->setMeshMaterial(material, m_cbMeshMaterialID->currentIndex());
+            });
+    ////////////////////////////////////////////////////////////////////////////////
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // render effects
+    connect(m_sldFluidReflection->getSlider(),  &QSlider::valueChanged, m_RenderWidget, &RenderWidget::setSurfaceReflectionConstant);
+    connect(m_sldFluidAttenuation->getSlider(), &QSlider::valueChanged, m_RenderWidget, &RenderWidget::setFluidAttennuationConstant);
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // shadow
+    connect(m_chkRenderShadow,                 &QCheckBox::toggled,    m_RenderWidget, &RenderWidget::enableShadow);
+    connect(m_chkVisualizeShadowRegion,        &QCheckBox::toggled,    m_RenderWidget, &RenderWidget::visualizeShadowRegion);
+    connect(m_sldShadowIntensity->getSlider(), &QSlider::valueChanged, m_RenderWidget, &RenderWidget::setShadowIntensity);
+    ////////////////////////////////////////////////////////////////////////////////
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // surface filter
+    connect(m_smFilterMethod,                SIGNAL(mapped(int)),       m_RenderWidget, SLOT(setFilterMethod(int)));
+    connect(m_sldNumIterations->getSlider(), SIGNAL(valueChanged(int)), m_RenderWidget, SLOT(setNumFilterIteration(int)));
+    connect(m_sldFilterSize->getSlider(),    SIGNAL(valueChanged(int)), m_RenderWidget, SLOT(setFilterSize(int)));
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // buttons
+    connect(m_btnReloadShaders,  &QPushButton::clicked, m_RenderWidget, &RenderWidget::reloadShaders);
+    connect(m_btnReloadTextures, &QPushButton::clicked, m_RenderWidget, &RenderWidget::reloadTextures);
+    connect(m_btnReloadTextures, &QPushButton::clicked, this,           &Controller::reloadTextures);
+    connect(m_btnClipViewPlane,  &QPushButton::clicked, m_RenderWidget, &RenderWidget::enableClipPlane);
+    connect(m_btnResetCamera,    &QPushButton::clicked, m_RenderWidget, &RenderWidget::resetCameraPosition);
+    //////////////////////////////////////////////////////////////////////////////
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-void Controller::setupTextureControllers(QBoxLayout* ctrLayout)
-{
-    ////////////////////////////////////////////////////////////////////////////////
-    // sky textures
-    m_cbSkyTexture = new EnhancedComboBox;
-    ctrLayout->addWidget(m_cbSkyTexture->getGroupBox("Sky Texture"));
-
-    ////////////////////////////////////////////////////////////////////////////////
-    // floor textures
-    m_cbFloorTexture = new EnhancedComboBox;
-
-    m_sldFloorSize = new EnhancedSlider;
-    m_sldFloorSize->setRange(1, 200);
-    //    m_sldFloorSize->getSlider()->setValue(48); // for fluid emitter + sphere mesh
-    m_sldFloorSize->getSlider()->setValue(3);
-
-    m_sldFloorExposure = new EnhancedSlider;
-    m_sldFloorExposure->setRange(1, 100);
-    m_sldFloorExposure->getSlider()->setValue(50);
-
-    QFrame* line = new QFrame();
-    line->setFrameShape(QFrame::HLine);
-    line->setFrameShadow(QFrame::Sunken);
-
-    QVBoxLayout* shadowLayout = new QVBoxLayout;
-    shadowLayout->addLayout(m_cbFloorTexture->getLayout());
-    shadowLayout->addSpacing(10);
-    shadowLayout->addWidget(line);
-    shadowLayout->addLayout(m_sldFloorSize->getLayoutWithLabel("Size:"));
-    shadowLayout->addLayout(m_sldFloorExposure->getLayoutWithLabel("Exposure:"));
-
-    QGroupBox* shadowGroup = new QGroupBox;
-    shadowGroup->setTitle("Floor Texture");
-    shadowGroup->setLayout(shadowLayout);
-    ctrLayout->addWidget(shadowGroup);
-
-    ////////////////////////////////////////////////////////////////////////////////
-    loadTextures();
-}
-
-//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-void Controller::setupFrameControllers(QBoxLayout* ctrLayout)
+void Controller::setupPlaybackControllers()
 {
     ////////////////////////////////////////////////////////////////////////////////
     // delay time between frames
@@ -148,13 +106,13 @@ void Controller::setupFrameControllers(QBoxLayout* ctrLayout)
     QVBoxLayout* frameControlLayout = new QVBoxLayout;
     frameControlLayout->addLayout(m_sldFrameDelay->getLayoutWithLabel("Delay:"));
     frameControlLayout->addLayout(m_sldFrameStep->getLayoutWithLabel("Step:"));
-    QGroupBox* grpFrameControl = new QGroupBox("Playback Controls");
-    grpFrameControl->setLayout(frameControlLayout);
-    ctrLayout->addWidget(grpFrameControl);
+    QGroupBox* grpPlaybackControl = new QGroupBox("Playback Controls");
+    grpPlaybackControl->setLayout(frameControlLayout);
+    m_LayoutRenderControllers->addWidget(grpPlaybackControl);
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-void Controller::setupFluidRenderModeControllers(QBoxLayout* ctrLayout)
+void Controller::setupFluidRenderModeControllers()
 {
     ////////////////////////////////////////////////////////////////////////////////
     /// particle viewing modes
@@ -178,20 +136,16 @@ void Controller::setupFluidRenderModeControllers(QBoxLayout* ctrLayout)
     QHBoxLayout* renderAnisotropyLayout = new QHBoxLayout;
     renderAnisotropyLayout->addWidget(m_chkUseAnisotropyKernel);
 
-    QFrame* line = new QFrame();
-    line->setFrameShape(QFrame::HLine);
-    line->setFrameShadow(QFrame::Sunken);
-
     QVBoxLayout* pRenderModesLayout = new QVBoxLayout;
     pRenderModesLayout->addLayout(pRenderModesChkLayout);
     pRenderModesLayout->addSpacing(10);
-    pRenderModesLayout->addWidget(line);
+    pRenderModesLayout->addWidget(QtAppUtils::getLineSeparator());
     pRenderModesLayout->addLayout(renderAnisotropyLayout);
     QGroupBox* pRenderModesGroup = new QGroupBox;
     pRenderModesGroup->setTitle(tr("Render Mode"));
     pRenderModesGroup->setLayout(pRenderModesLayout);
 
-    ctrLayout->addWidget(pRenderModesGroup);
+    m_LayoutRenderControllers->addWidget(pRenderModesGroup);
 
     m_smFluidRenderMode = new QSignalMapper(this);
     connect(rdbPVSphere,    SIGNAL(clicked(bool)), m_smFluidRenderMode, SLOT(map()));
@@ -208,7 +162,7 @@ void Controller::setupFluidRenderModeControllers(QBoxLayout* ctrLayout)
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-void Controller::setupColorControllers(QBoxLayout* ctrLayout)
+void Controller::setupRenderMaterialControllers()
 {
     ////////////////////////////////////////////////////////////////////////////////
     /// color modes
@@ -226,7 +180,7 @@ void Controller::setupColorControllers(QBoxLayout* ctrLayout)
     QGroupBox* colorModeGroup = new QGroupBox;
     colorModeGroup->setTitle(tr("Particle Color"));
     colorModeGroup->setLayout(colorModeLayout);
-    ctrLayout->addWidget(colorModeGroup);
+    m_LayoutRenderControllers->addWidget(colorModeGroup);
 
     m_smParticleColorMode = new QSignalMapper(this);
     connect(rdbColorRandom,  SIGNAL(clicked()), m_smParticleColorMode, SLOT(map()));
@@ -241,10 +195,10 @@ void Controller::setupColorControllers(QBoxLayout* ctrLayout)
     m_msParticleMaterial->setCustomMaterial(CUSTOM_PARTICLE_MATERIAL);
     m_msParticleMaterial->setDefaultCustomMaterial(true);
 
-    m_msFluidVolumeMaterial = new MaterialSelector;
-    m_msFluidVolumeMaterial->setCustomMaterial(CUSTOM_SURFACE_MATERIAL);
+    m_msFluidViewMaterial = new MaterialSelector;
+    m_msFluidViewMaterial->setCustomMaterial(CUSTOM_SURFACE_MATERIAL);
     //    m_msFluidVolumeMaterial->setMaterial(DEFAULT_FLUID_VOLUME_MATERIAL);
-    m_msFluidVolumeMaterial->setMaterial(CUSTOM_SURFACE_MATERIAL);
+    m_msFluidViewMaterial->setMaterial(CUSTOM_SURFACE_MATERIAL);
 
     m_msMeshMaterial = new MaterialSelector;
     m_msMeshMaterial->setCustomMaterial(DEFAULT_MESH_MATERIAL);
@@ -264,13 +218,13 @@ void Controller::setupColorControllers(QBoxLayout* ctrLayout)
     particleColorLayout->addWidget(new QLabel("Particle View: "), 0, 0, Qt::AlignRight);
     particleColorLayout->addLayout(m_msParticleMaterial->getLayout(), 0, 1, 1, 2);
     particleColorLayout->addWidget(new QLabel("Fluid View: "), 1, 0, Qt::AlignRight);
-    particleColorLayout->addLayout(m_msFluidVolumeMaterial->getLayout(), 1, 1, 1, 2);
+    particleColorLayout->addLayout(m_msFluidViewMaterial->getLayout(), 1, 1, 1, 2);
     particleColorLayout->addWidget(new QLabel("Mesh: "), 2, 0, Qt::AlignRight);
     particleColorLayout->addLayout(meshMaterialSelectorLayout, 2, 1, 1, 2);
 
     QGroupBox* particleColorGroup = new QGroupBox("Material");
     particleColorGroup->setLayout(particleColorLayout);
-    ctrLayout->addWidget(particleColorGroup);
+    m_LayoutRenderControllers->addWidget(particleColorGroup);
 
     ///////////////////////////////////////////////////////////////////////////////
     // Reflection and attennuation
@@ -284,13 +238,13 @@ void Controller::setupColorControllers(QBoxLayout* ctrLayout)
     QVBoxLayout* fluidColorLayout = new QVBoxLayout;
     fluidColorLayout->addLayout(m_sldFluidReflection->getLayoutWithLabel("Reflection: "));
     fluidColorLayout->addLayout(m_sldFluidAttenuation->getLayoutWithLabel("Attennuation: "));
-    QGroupBox* grpFluidColor = new QGroupBox("Fluid Color");
+    QGroupBox* grpFluidColor = new QGroupBox("Render effects");
     grpFluidColor->setLayout(fluidColorLayout);
-    ctrLayout->addWidget(grpFluidColor);
+    m_LayoutRenderControllers->addWidget(grpFluidColor);
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-void Controller::setupShadowControllers(QBoxLayout* ctrLayout)
+void Controller::setupShadowControllers()
 {
     ////////////////////////////////////////////////////////////////////////////////
     /// show shadow
@@ -304,25 +258,21 @@ void Controller::setupShadowControllers(QBoxLayout* ctrLayout)
     m_chkVisualizeShadowRegion->setEnabled(false);
     connect(m_chkRenderShadow, &QCheckBox::toggled, m_chkVisualizeShadowRegion, &QCheckBox::setEnabled);
 
-    QFrame* line = new QFrame();
-    line->setFrameShape(QFrame::HLine);
-    line->setFrameShadow(QFrame::Sunken);
-
     QVBoxLayout* shadowLayout = new QVBoxLayout;
     shadowLayout->addWidget(m_chkRenderShadow);
     shadowLayout->addWidget(m_chkVisualizeShadowRegion);
     shadowLayout->addSpacing(10);
-    shadowLayout->addWidget(line);
+    shadowLayout->addWidget(QtAppUtils::getLineSeparator());
     shadowLayout->addLayout(m_sldShadowIntensity->getLayoutWithLabel("Intensity:"));
 
     QGroupBox* shadowGroup = new QGroupBox;
     shadowGroup->setTitle("Render Shadow");
     shadowGroup->setLayout(shadowLayout);
-    ctrLayout->addWidget(shadowGroup);
+    m_LayoutRenderControllers->addWidget(shadowGroup);
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-void Controller::setupFilterControllers(QBoxLayout* ctrLayout)
+void Controller::setupFilterControllers()
 {
     ////////////////////////////////////////////////////////////////////////////////
     /// filter method
@@ -344,7 +294,7 @@ void Controller::setupFilterControllers(QBoxLayout* ctrLayout)
     QGroupBox* filterMethodGroup = new QGroupBox;
     filterMethodGroup->setTitle(tr("Surface Filter Method"));
     filterMethodGroup->setLayout(filterMethodLayout);
-    ctrLayout->addWidget(filterMethodGroup);
+    m_LayoutRenderControllers->addWidget(filterMethodGroup);
 
     m_smFilterMethod = new QSignalMapper(this);
     connect(rdbBilateralGaussian,    SIGNAL(clicked()), m_smFilterMethod, SLOT(map()));
@@ -381,41 +331,49 @@ void Controller::setupFilterControllers(QBoxLayout* ctrLayout)
     filterControlLayout->addLayout(m_sldFilterSize->getLayoutWithLabel("Filter Size:"));
     QGroupBox* grpFilterControl = new QGroupBox("Filter Controls");
     grpFilterControl->setLayout(filterControlLayout);
-    ctrLayout->addWidget(grpFilterControl);
+    m_LayoutRenderControllers->addWidget(grpFilterControl);
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-void Controller::setupButtons(QBoxLayout* ctrLayout)
+void Controller::setupButtons()
 {
     ////////////////////////////////////////////////////////////////////////////////
     /// reload
     m_btnReloadShaders  = new QPushButton("Reload Shaders");
     m_btnReloadTextures = new QPushButton("Reload Textures");
+    m_btnPause          = new QPushButton(QString("Pause"));
+    m_btnPause->setCheckable(true);
+    m_btnNextFrame = new QPushButton(QString("Next Frame"));
 
-    QGridLayout* btnReloadLayout = new QGridLayout;
-    btnReloadLayout->addWidget(m_btnReloadShaders,  0, 0, 1, 1);
-    btnReloadLayout->addWidget(m_btnReloadTextures, 0, 1, 1, 1);
-    ctrLayout->addLayout(btnReloadLayout);
+    QGridLayout* layout2Columns = new QGridLayout;
+    layout2Columns->addWidget(m_btnReloadShaders,  0, 0, 1, 1);
+    layout2Columns->addWidget(m_btnReloadTextures, 0, 1, 1, 1);
+    layout2Columns->addWidget(m_btnPause,          1, 0, 1, 1);
+    layout2Columns->addWidget(m_btnNextFrame,      1, 1, 1, 1);
+    m_MainLayout->addStretch();
+    m_MainLayout->addLayout(layout2Columns);
 
     ////////////////////////////////////////////////////////////////////////////////
     /// other buttons
-    m_btnPause = new QPushButton(QString("Pause"));
-    m_btnPause->setCheckable(true);
-    m_btnNextFrame = new QPushButton(QString("Next Frame"));
-    m_btnReset     = new QPushButton(QString("Reset"));
-    m_btnReverse   = new QPushButton(QString("Reverse"));
+
+    m_btnReset   = new QPushButton(QString("Reset"));
+    m_btnReverse = new QPushButton(QString("Reverse"));
     m_btnReverse->setCheckable(true);
     m_btnRepeatPlay = new QPushButton(QString("Repeat"));
     m_btnRepeatPlay->setCheckable(true);
+
     m_btnClipViewPlane = new QPushButton(QString("Clip View"));
     m_btnClipViewPlane->setCheckable(true);
+    m_btnEditClipViewPlane = new QPushButton(QString("Edit Clip Plane"));
+    m_btnResetCamera       = new QPushButton(QString("Reset Camera"));
 
-    QGridLayout* btnLayout = new QGridLayout;
-    btnLayout->addWidget(m_btnPause,         0, 0, 1, 1);
-    btnLayout->addWidget(m_btnNextFrame,     0, 1, 1, 1);
-    btnLayout->addWidget(m_btnReset,         1, 0, 1, 1);
-    btnLayout->addWidget(m_btnRepeatPlay,    1, 1, 1, 1);
-    btnLayout->addWidget(m_btnReverse,       2, 0, 1, 1);
-    btnLayout->addWidget(m_btnClipViewPlane, 2, 1, 1, 1);
-    ctrLayout->addLayout(btnLayout);
+    QGridLayout* layout3Columns = new QGridLayout;
+    layout3Columns->addWidget(m_btnReset,             0, 0, 1, 1);
+    layout3Columns->addWidget(m_btnRepeatPlay,        0, 1, 1, 1);
+    layout3Columns->addWidget(m_btnReverse,           0, 2, 1, 1);
+
+    layout3Columns->addWidget(m_btnClipViewPlane,     1, 0, 1, 1);
+    layout3Columns->addWidget(m_btnEditClipViewPlane, 1, 1, 1, 1);
+    layout3Columns->addWidget(m_btnResetCamera,       1, 2, 1, 1);
+    m_MainLayout->addLayout(layout3Columns);
 }

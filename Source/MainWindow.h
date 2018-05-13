@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "FluidRenderWidget.h"
+#include "RenderWidget.h"
 #include "Controller.h"
 #include "DataManager.h"
 #include "DataReader.h"
@@ -65,12 +65,12 @@ private:
     void connectWidgets();
 
     ////////////////////////////////////////////////////////////////////////////////
-    FluidRenderWidget* m_RenderWidget   = nullptr;
-    Controller*        m_Controller     = nullptr;
-    QSlider*           m_sldFrame       = nullptr;
-    QCheckBox*         m_chkExportFrame = nullptr;
-    BrowsePathWidget*  m_InputPath      = nullptr;
-    BrowsePathWidget*  m_OutputPath     = nullptr;
+    RenderWidget*     m_RenderWidget   = nullptr;
+    Controller*       m_Controller     = nullptr;
+    QSlider*          m_sldFrame       = nullptr;
+    QCheckBox*        m_chkExportFrame = nullptr;
+    BrowsePathWidget* m_InputPath      = nullptr;
+    BrowsePathWidget* m_OutputPath     = nullptr;
 
     QLabel* m_lblStatusNumParticles = nullptr;
     QLabel* m_lblStatusCurrentFrame = nullptr;

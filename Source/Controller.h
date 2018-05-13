@@ -27,71 +27,91 @@
 #include <QtAppHelpers/MaterialSelector.h>
 #include <QtAppHelpers/EnhancedComboBox.h>
 #include <QtAppHelpers/EnhancedSlider.h>
-#include <QtAppHelpers/PointLightEditor.h>
+#include <QtAppHelpers/OpenGLController.h>
 
 #include "Common.h"
+#include "RenderWidget.h"
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-class Controller : public QWidget
+class Controller : public OpenGLController
 {
     Q_OBJECT
     friend class MainWindow;
 public:
-    explicit Controller(QWidget* parent) :
-        QWidget(parent)
+    explicit Controller(RenderWidget* renderWidget, QWidget* parent = nullptr, int width = 300) :
+        OpenGLController(static_cast<OpenGLWidget*>(renderWidget), parent, width, true, true, false), m_RenderWidget(renderWidget)
     {
         setupGUI();
+        connectWidgets();
     }
-
-public slots:
-    void loadTextures();
 
 private:
     void setupGUI();
-    void setupTextureControllers(QBoxLayout* ctrLayout);
-    void setupFrameControllers(QBoxLayout* ctrLayout);
-    void setupFluidRenderModeControllers(QBoxLayout* ctrLayout);
-    void setupColorControllers(QBoxLayout* ctrLayout);
-    void setupShadowControllers(QBoxLayout* ctrLayout);
-    void setupFilterControllers(QBoxLayout* ctrLayout);
-    void setupButtons(QBoxLayout* ctrLayout);
+    void connectWidgets();
+    ////////////////////////////////////////////////////////////////////////////////
+    // main objects
+    RenderWidget* m_RenderWidget = nullptr;
+    ////////////////////////////////////////////////////////////////////////////////
 
     ////////////////////////////////////////////////////////////////////////////////
-    QSignalMapper* m_smFluidRenderMode;
-    QSignalMapper* m_smParticleColorMode;
-    QSignalMapper* m_smFilterMethod;
-
+    // playback controllers
+    void setupPlaybackControllers();
     EnhancedSlider* m_sldFrameStep;
     EnhancedSlider* m_sldFrameDelay;
+    ////////////////////////////////////////////////////////////////////////////////
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // fluid render mode
+    void setupFluidRenderModeControllers();
+    QSignalMapper* m_smFluidRenderMode;
+    QCheckBox*     m_chkUseAnisotropyKernel;
+    ////////////////////////////////////////////////////////////////////////////////
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // materials
+    void setupRenderMaterialControllers();
+    QSignalMapper* m_smParticleColorMode;
+
     EnhancedSlider* m_sldFluidReflection;
     EnhancedSlider* m_sldFluidAttenuation;
-    EnhancedSlider* m_sldNumIterations;
-    EnhancedSlider* m_sldFilterSize;
 
-    EnhancedComboBox* m_cbSkyTexture;
-    EnhancedComboBox* m_cbFloorTexture;
-    EnhancedSlider*   m_sldFloorSize;
-    EnhancedSlider*   m_sldFloorExposure;
-    QCheckBox*        m_chkUseAnisotropyKernel;
     MaterialSelector* m_msParticleMaterial;
-    MaterialSelector* m_msFluidVolumeMaterial;
+    MaterialSelector* m_msFluidViewMaterial;
     MaterialSelector* m_msMeshMaterial;
     QComboBox*        m_cbMeshMaterialID;
+    ////////////////////////////////////////////////////////////////////////////////
 
-    QPushButton* m_btnPause;
-    QPushButton* m_btnNextFrame;
-    QPushButton* m_btnReset;
-    QPushButton* m_btnReverse;
-    QPushButton* m_btnRepeatPlay;
-    QPushButton* m_btnClipViewPlane;
-    QPushButton* m_btnReloadShaders;
-    QPushButton* m_btnReloadTextures;
-
-    QListWidget* m_lstSimInfo;
-
+    ////////////////////////////////////////////////////////////////////////////////
+    // shadow
+    void setupShadowControllers();
     QCheckBox*      m_chkRenderShadow;
     QCheckBox*      m_chkVisualizeShadowRegion;
     EnhancedSlider* m_sldShadowIntensity;
+    ////////////////////////////////////////////////////////////////////////////////
 
-    PointLightEditor* m_LightEditor;
+    ////////////////////////////////////////////////////////////////////////////////
+    // filter
+    void setupFilterControllers();
+    QSignalMapper*  m_smFilterMethod;
+    EnhancedSlider* m_sldNumIterations;
+    EnhancedSlider* m_sldFilterSize;
+    ////////////////////////////////////////////////////////////////////////////////
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // buttons
+    void setupButtons();
+    QPushButton* m_btnReloadShaders;
+    QPushButton* m_btnReloadTextures;
+
+    QPushButton* m_btnPause;
+    QPushButton* m_btnNextFrame;
+
+    QPushButton* m_btnReset;
+    QPushButton* m_btnReverse;
+    QPushButton* m_btnRepeatPlay;
+
+    QPushButton* m_btnClipViewPlane;
+    QPushButton* m_btnEditClipViewPlane;
+    QPushButton* m_btnResetCamera;
+    ////////////////////////////////////////////////////////////////////////////////
 };

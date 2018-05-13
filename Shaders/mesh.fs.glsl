@@ -33,11 +33,11 @@ uniform int       u_HasTexture;
 uniform int       u_HasShadow;
 uniform int       u_VisualizeShadowRegion;
 uniform float     u_ShadowIntensity;
+uniform float     u_Exposure = 1.0f;
 uniform sampler2D u_TexSampler;
 uniform sampler2D u_SolidShadowMaps[NUM_TOTAL_LIGHTS];
 uniform sampler2D u_FluidShadowMaps[NUM_TOTAL_LIGHTS];
 uniform sampler2D u_FluidShadowThickness[NUM_TOTAL_LIGHTS];
-
 
 in VS_OUT
 {
@@ -130,5 +130,5 @@ void main()
         shadeColor += shadeLight(i, normal, f_FragPos, viewDir, f_TexCoord);
     }
 
-    outColor = vec4(shadeColor, 1.0);
+    outColor = vec4(u_Exposure * shadeColor, 1.0);
 }

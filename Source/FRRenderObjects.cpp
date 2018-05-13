@@ -82,6 +82,8 @@ void FRMeshRender::render(bool bRenderShadow, bool bVisualizeShadowRegion, float
         m_Shader->setUniformValue(m_UHasShadow, 0);
     }
 
+    m_Shader->setUniformValue(m_UExposure, m_Exposure);
+
     glCall(glBindVertexArray(m_VAO));
     m_MeshObj->draw();
     glCall(glBindVertexArray(0));
@@ -133,6 +135,7 @@ void FRMeshRender::initRenderData()
     m_UTexSampler            = m_Shader->getUniformLocation("u_TexSampler");
     m_UShadowIntensity       = m_Shader->getUniformLocation("u_ShadowIntensity");
     m_UVisualizeShadowRegion = m_Shader->getUniformLocation("u_VisualizeShadowRegion");
+    m_UExposure              = m_Shader->getUniformLocation("u_Exposure");
 
     for(int i = 0; i < MAX_NUM_LIGHTS; ++i) {
         char buff[128];

@@ -44,7 +44,7 @@ void MainWindow::instantiateOpenGLWidget()
         delete m_GLWidget;
     }
 
-    m_RenderWidget = new FluidRenderWidget(this);
+    m_RenderWidget = new RenderWidget(this);
     setupOpenglWidget(m_RenderWidget);
 }
 
@@ -179,10 +179,9 @@ void MainWindow::loadDataInfo(QString dataPath)
         }
 
         if(dataInfo->hasLightInfo) {
-            auto& light = m_RenderWidget->getLightObjs();
-            light->setNumLights(1);
-            light->setLightPosition(Vec4f(dataInfo->light_position[0], dataInfo->light_position[1], dataInfo->light_position[2], 1.0), 0);
-            m_RenderWidget->updateLights();
+            Vector<PointLights::PointLightData> lights(1);
+            lights.front().position = Vec4f(dataInfo->light_position[0], dataInfo->light_position[1], dataInfo->light_position[2], 1.0);
+            m_RenderWidget->setLights(lights);
             m_Controller->m_LightEditor->lightToGUI();
         }
     }
@@ -210,7 +209,7 @@ void MainWindow::setupRenderWidgets()
     renderLayout->addWidget(m_sldFrame);
     renderLayout->addLayout(inputOutputLayout);
 
-    m_Controller = new Controller(this);
+    m_Controller = new Controller(m_RenderWidget, this);
 
     QHBoxLayout* mainLayout = new QHBoxLayout;
     mainLayout->addLayout(renderLayout);
@@ -284,60 +283,35 @@ void MainWindow::setupStatusBar()
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 void MainWindow::connectWidgets()
 {
+    connect(m_Controller->m_chkUseAnisotropyKernel,     SIGNAL(toggled(bool)),     m_DataReader.get(), SLOT(enableAnisotropyKernel(bool)));
     ////////////////////////////////////////////////////////////////////////////////
-    // textures
-    connect(m_Controller->m_cbSkyTexture->getComboBox(),   SIGNAL(currentIndexChanged(int)), m_RenderWidget, SLOT(setSkyBoxTexture(int)));
-    connect(m_Controller->m_cbFloorTexture->getComboBox(), SIGNAL(currentIndexChanged(int)), m_RenderWidget, SLOT(setFloorTexture(int)));
-    connect(m_Controller->m_sldFloorSize->getSlider(),     SIGNAL(valueChanged(int)),        m_RenderWidget, SLOT(setFloorSize(int)));
-
-    ////////////////////////////////////////////////////////////////////////////////
-    // frame params
+    // playback  params
     connect(m_Controller->m_sldFrameDelay->getSlider(), SIGNAL(valueChanged(int)), m_DataReader.get(), SLOT(setDelayTime(int)));
     connect(m_Controller->m_sldFrameStep->getSlider(),  SIGNAL(valueChanged(int)), m_DataReader.get(), SLOT(setFrameStep(int)));
 
     ////////////////////////////////////////////////////////////////////////////////
-    // render modes/colors
-    connect(m_Controller->m_smFluidRenderMode,     SIGNAL(mapped(int)),                             m_RenderWidget, SLOT(setFluidRenderMode(int)));
-    connect(m_Controller->m_smParticleColorMode,   SIGNAL(mapped(int)),                             m_RenderWidget, SLOT(setParticleColorMode(int)));
-    connect(m_Controller->m_msParticleMaterial,    SIGNAL(materialChanged(Material::MaterialData)), m_RenderWidget, SLOT(setParticleMaterial(Material::MaterialData)));
-    connect(m_Controller->m_msFluidVolumeMaterial, SIGNAL(materialChanged(Material::MaterialData)), m_RenderWidget, SLOT(setFluidVolumeMaterial(Material::MaterialData)));
-    connect(m_Controller->m_msMeshMaterial,        &MaterialSelector::materialChanged,              [&](const Material::MaterialData& material)
-            {
-                m_RenderWidget->setMeshMaterial(material, m_Controller->m_cbMeshMaterialID->currentIndex());
-            });
-    connect(m_Controller->m_chkUseAnisotropyKernel, SIGNAL(toggled(bool)), m_RenderWidget,     SLOT(enableAnisotropyKernel(bool)));
-    connect(m_Controller->m_chkUseAnisotropyKernel, SIGNAL(toggled(bool)), m_DataReader.get(), SLOT(enableAnisotropyKernel(bool)));
-
-    ////////////////////////////////////////////////////////////////////////////////
-    // fluid render
-    connect(m_Controller->m_sldFluidReflection->getSlider(),  &QSlider::valueChanged, m_RenderWidget, &FluidRenderWidget::setSurfaceReflectionConstant);
-    connect(m_Controller->m_sldFluidAttenuation->getSlider(), &QSlider::valueChanged, m_RenderWidget, &FluidRenderWidget::setFluidAttennuationConstant);
-
-    ////////////////////////////////////////////////////////////////////////////////
-    // filter
-    connect(m_Controller->m_smFilterMethod,                SIGNAL(mapped(int)),       m_RenderWidget, SLOT(setFilterMethod(int)));
-    connect(m_Controller->m_sldNumIterations->getSlider(), SIGNAL(valueChanged(int)), m_RenderWidget, SLOT(setNumFilterIteration(int)));
-    connect(m_Controller->m_sldFilterSize->getSlider(),    SIGNAL(valueChanged(int)), m_RenderWidget, SLOT(setFilterSize(int)));
-
-    ////////////////////////////////////////////////////////////////////////////////
     // buttons
-    connect(m_Controller->m_btnReloadShaders,  SIGNAL(clicked(bool)), m_RenderWidget,     SLOT(reloadShaders()));
-    connect(m_Controller->m_btnReloadTextures, SIGNAL(clicked(bool)), m_RenderWidget,     SLOT(reloadTextures()));
-    connect(m_Controller->m_btnReloadTextures, SIGNAL(clicked(bool)), m_Controller,       SLOT(loadTextures()));
-    connect(m_Controller->m_btnPause,          SIGNAL(clicked(bool)), m_DataReader.get(), SLOT(pause(bool)));
-    connect(m_Controller->m_btnNextFrame,      SIGNAL(clicked(bool)), m_DataReader.get(), SLOT(readNextFrame()));
-    connect(m_Controller->m_btnReset,          SIGNAL(clicked(bool)), m_DataReader.get(), SLOT(resetToFirstFrame()));
-    connect(m_Controller->m_btnRepeatPlay,     SIGNAL(clicked(bool)), m_DataReader.get(), SLOT(enableRepeat(bool)));
-    connect(m_Controller->m_btnReverse,        SIGNAL(clicked(bool)), m_DataReader.get(), SLOT(enableReverse(bool)));
-    connect(m_Controller->m_btnClipViewPlane,  SIGNAL(clicked(bool)), m_RenderWidget,     SLOT(enableClipPlane(bool)));
+    connect(m_Controller->m_btnPause,             SIGNAL(clicked(bool)), m_DataReader.get(), SLOT(pause(bool)));
+    connect(m_Controller->m_btnNextFrame,         &QPushButton::clicked, m_DataReader.get(), &DataReader::readNextFrame);
+
+    connect(m_Controller->m_btnReset,             &QPushButton::clicked, m_DataReader.get(), &DataReader::resetToFirstFrame);
+    connect(m_Controller->m_btnRepeatPlay,        &QPushButton::clicked, m_DataReader.get(), &DataReader::enableRepeat);
+    connect(m_Controller->m_btnReverse,           &QPushButton::clicked, m_DataReader.get(), &DataReader::enableReverse);
+
+    connect(m_Controller->m_btnEditClipViewPlane, &QPushButton::clicked, [&] { m_ClipPlaneEditor->show(); });
+    ////////////////////////////////////////////////////////////////////////////////
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // capture path
+    connect(m_OutputPath, &BrowsePathWidget::pathChanged, m_RenderWidget, &RenderWidget::setCapturePath);
+    ////////////////////////////////////////////////////////////////////////////////
 
     ////////////////////////////////////////////////////////////////////////////////
     //  data handle
     connect(m_DataManager.get(),     SIGNAL(numFramesChanged(int)),           this,               SLOT(updateNumFrames(int)));
     connect(m_DataManager.get(),     SIGNAL(numFramesChanged(int)),           m_DataReader.get(), SLOT(setNumFrames(int)));
     connect(m_InputPath,             SIGNAL(pathChanged(QString)),            this,               SLOT(loadDataInfo(QString)));
-    connect(m_OutputPath,            SIGNAL(pathChanged(QString)),            m_RenderWidget,     SLOT(setCapturePath(QString)));
-    connect(m_chkExportFrame,        &QCheckBox::toggled,                     m_RenderWidget,     &FluidRenderWidget::enableExportFrame);
+    connect(m_chkExportFrame,        &QCheckBox::toggled,                     m_RenderWidget,     &RenderWidget::enableExportFrame);
 
     connect(m_DataReader.get(),      SIGNAL(currentFrameChanged(int)),        this,               SLOT(updateStatusCurrentFrame(int)));
     connect(m_DataReader.get(),      SIGNAL(currentFrameChanged(int)),        m_sldFrame,         SLOT(setValue(int)));
@@ -355,12 +329,4 @@ void MainWindow::connectWidgets()
     connect(m_DataList.get(),        SIGNAL(currentTextChanged(QString)),     m_InputPath,        SLOT(setPath(QString)));
 
     connect(m_ClipPlaneEditor.get(), SIGNAL(clipPlaneChanged(Vec4f)),         m_RenderWidget,     SLOT(setClipPlane(Vec4f)));
-
-    ////////////////////////////////////////////////////////////////////////////////
-    // lights
-    connect(m_Controller->m_LightEditor,                     &PointLightEditor::lightsChanged,     m_RenderWidget,              &FluidRenderWidget::updateLights);
-    connect(m_RenderWidget,                                  &FluidRenderWidget::lightsObjChanged, m_Controller->m_LightEditor, &PointLightEditor::setLightObject);
-    connect(m_Controller->m_chkRenderShadow,                 &QCheckBox::toggled,                  m_RenderWidget,              &FluidRenderWidget::enableShadow);
-    connect(m_Controller->m_chkVisualizeShadowRegion,        &QCheckBox::toggled,                  m_RenderWidget,              &FluidRenderWidget::visualizeShadowRegion);
-    connect(m_Controller->m_sldShadowIntensity->getSlider(), &QSlider::valueChanged,               m_RenderWidget,              &FluidRenderWidget::setShadowIntensity);
 }
