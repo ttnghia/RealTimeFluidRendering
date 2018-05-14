@@ -41,7 +41,7 @@ void main()
     for(int x = -u_FilterSize; x <= u_FilterSize; x++) {
         for(int y = -u_FilterSize; y <= u_FilterSize; y++) {
             vec2  samplep         = vec2(x, y) * blurRadius + f_TexCoord;
-            float sampleThickness = texture2D(u_ThicknessTex, samplep).r;
+            float sampleThickness = texture(u_ThicknessTex, samplep).r;
             float r               = length(vec2(x, y));
             float w               = exp(-r * r / two_sigma2);
 
