@@ -39,9 +39,12 @@ void Controller::connectWidgets()
 {
     ////////////////////////////////////////////////////////////////////////////////
     // textures
+    disconnect(m_cbFloorTexture->getComboBox(), 0, 0, 0);
+    disconnect(m_sldFloorSize->getSlider(),     0, 0, 0);
+    disconnect(m_sldFloorExposure->getSlider(), 0, 0, 0);
     connect(m_cbFloorTexture->getComboBox(), SIGNAL(currentIndexChanged(int)), m_RenderWidget, SLOT(setFluidFloorTexture(int)));
-    connect(m_sldFloorSize->getSlider(),     &QSlider::valueChanged,           m_RenderWidget, &RenderWidget::setFluidFloorSize);
-    connect(m_sldFloorExposure->getSlider(), &QSlider::valueChanged,           m_RenderWidget, &RenderWidget::setFluidFloorExposure);
+    connect(m_sldFloorSize->getSlider(),          &QSlider::valueChanged,      m_RenderWidget,    &RenderWidget::setFluidFloorSize);
+    connect(m_sldFloorExposure->getSlider(),      &QSlider::valueChanged,      m_RenderWidget,    &RenderWidget::setFluidFloorExposure);
     ////////////////////////////////////////////////////////////////////////////////
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -52,7 +55,7 @@ void Controller::connectWidgets()
 
     connect(m_msParticleMaterial,     SIGNAL(materialChanged(Material::MaterialData)), m_RenderWidget, SLOT(setParticleMaterial(Material::MaterialData)));
     connect(m_msFluidViewMaterial,    SIGNAL(materialChanged(Material::MaterialData)), m_RenderWidget, SLOT(setFluidViewMaterial(Material::MaterialData)));
-    connect(m_msMeshMaterial,         &MaterialSelector::materialChanged,              [&](const Material::MaterialData& material)
+    connect(m_msMeshMaterial,              &MaterialSelector::materialChanged,                      [&](const Material::MaterialData& material)
             {
                 m_RenderWidget->setMeshMaterial(material, m_cbMeshMaterialID->currentIndex());
             });
@@ -80,7 +83,7 @@ void Controller::connectWidgets()
     // buttons
     connect(m_btnReloadShaders,  &QPushButton::clicked, m_RenderWidget, &RenderWidget::reloadShaders);
     connect(m_btnReloadTextures, &QPushButton::clicked, m_RenderWidget, &RenderWidget::reloadTextures);
-    connect(m_btnReloadTextures, &QPushButton::clicked, this,           &Controller::reloadTextures);
+    connect(m_btnReloadTextures, &QPushButton::clicked,           this, &Controller::reloadTextures);
     connect(m_btnClipViewPlane,  &QPushButton::clicked, m_RenderWidget, &RenderWidget::enableClipPlane);
     connect(m_btnResetCamera,    &QPushButton::clicked, m_RenderWidget, &RenderWidget::resetCameraPosition);
     //////////////////////////////////////////////////////////////////////////////
