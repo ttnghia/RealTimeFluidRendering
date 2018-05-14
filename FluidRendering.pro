@@ -26,7 +26,13 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = FluidRendering
 TEMPLATE = app
 
-BANANA_DIR = D:/Programming/Banana
+win32 {
+    BANANA_DIR = D:/Programming/Banana
+}
+macx {
+    BANANA_DIR = /Users/nghia/Programming/Banana
+}
+
 include($$BANANA_DIR/BananaCore/BananaCore.pri)
 include($$BANANA_DIR/QtAppHelpers/QtAppHelpers.pri)
 include($$BANANA_DIR/OpenGLHelpers/OpenGLHelpers.pri)
