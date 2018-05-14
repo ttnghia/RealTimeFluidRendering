@@ -21,7 +21,7 @@
 // fragment shader, mesh shading
 #version 410 core
 
-#define NUM_TOTAL_LIGHTS 8
+#define NUM_TOTAL_LIGHTS 2
 //#define SHADOW_BIAS      -0.15 // for fluid emitter + sphere mesh
 #define SHADOW_BIAS      -0.05
 

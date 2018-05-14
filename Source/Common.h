@@ -75,7 +75,7 @@
 #define DEFAULT_FILTER_SIZE          5
 
 #define MAX_FILTER_SIZE              100
-#define SHADOWMAP_TEXTURE_SIZE       2048
+#define SHADOWMAP_TEXTURE_SIZE       512
 #define CLEAR_DEPTH_VALUE            -1000000.0f
 
 #define THICKNESS_TEXTURE_SIZE_RATIO 0.25

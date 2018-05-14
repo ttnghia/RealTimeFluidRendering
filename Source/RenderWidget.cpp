@@ -51,6 +51,7 @@ void RenderWidget::resizeOpenGLWindow(int w, int h)
     m_RDataThicknessPass.offScreenRender->resize(w, h);
     m_RDataNormalPass.offScreenRender->resize(w, h);
     m_FilterFrameBuffer->resize(w, h);
+    m_UBufferCamData->uploadData(glm::value_ptr(m_Camera->getInverseProjectionMatrix()), 3 * sizeof(Mat4x4f), sizeof(Mat4x4f));
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -63,9 +64,8 @@ void RenderWidget::renderOpenGL()
                 generateSolidLightDepthMaps();
                 generateFluidShadowMaps();
                 generateFluidShadowThicknessMaps();
-                glCall(glViewport(0, 0, width(), height()));
             }
-
+            glCall(glViewport(0, 0, width(), height()));
             renderFluidFloor();
             renderParticles();
             renderMeshes();

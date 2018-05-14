@@ -25,7 +25,7 @@
 #define COLOR_MODE_RANDOM           1
 #define COLOR_MODE_RAMP             2
 
-#define NUM_TOTAL_LIGHTS            8
+#define NUM_TOTAL_LIGHTS            2
 struct PointLight
 {
     vec4 ambient;

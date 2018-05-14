@@ -21,7 +21,7 @@
 // fragment shader, compositing pass
 #version 410 core
 
-#define NUM_TOTAL_LIGHTS 8
+#define NUM_TOTAL_LIGHTS 2
 #define SHADOW_BIAS      -0.01
 #define DEPTH_BIAS       0.0001
 
@@ -146,7 +146,7 @@ vec3 computeAttennuation(float thickness)
     return vec3(exp(-k_r * thickness), exp(-k_g * thickness), exp(-k_b * thickness));
 }
 
-const int lightID = 0;
+uniform int lightID = 0;
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 void main()
 {

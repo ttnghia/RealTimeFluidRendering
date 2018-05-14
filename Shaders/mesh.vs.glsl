@@ -27,7 +27,7 @@ layout(std140) uniform ModelMatrix
     mat4 normalMatrix;
 };
 
-#define NUM_TOTAL_LIGHTS 8
+#define NUM_TOTAL_LIGHTS 2
 struct LightMatrix
 {
     mat4 viewMatrix;
