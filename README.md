@@ -13,12 +13,11 @@
 </table>
 </p>
 
-This is implementation of my i3D2018 paper "[A Narrow-Range Filter for Screen-Space Fluid Rendering](https://ttnghia.github.io/portfolio/narrow-range-filter/)". It is not the one that used in my paper but has been written from scratch for demonstration purpose and depends heavily on many external libraries, especially [Banana](https://github.com/ttnghia/Banana). Users should not expect to compile it by themselves but instead please download and run the provided binary (Windows | Mac) over the provided datasets.
+This is implementation of my i3D2018 paper "[A Narrow-Range Filter for Screen-Space Fluid Rendering](https://ttnghia.github.io/portfolio/narrow-range-filter/)". It is not the one that used in my paper but has been written from scratch for demonstration purpose and depends heavily on many external libraries, especially [Banana](https://github.com/ttnghia/Banana). Users should not expect to compile it by themselves but instead please download and run the provided binary (Windows x64) over the provided datasets.
 
 ### Download
 
-* Windows/Mac binary and dataset: [https://github.com/ttnghia/RealTimeFluidRendering/releases](https://github.com/ttnghia/RealTimeFluidRendering/releases)
-
+* Windows binary and dataset: [https://github.com/ttnghia/RealTimeFluidRendering/releases](https://github.com/ttnghia/RealTimeFluidRendering/releases)
 
 ### Brief Usage
 Firstly, one need to download and extract the provided datasets. For loading data, there are two ways:
@@ -43,7 +42,7 @@ SolidFrame
 ...frame.%4d.pos
 ```
 
-**viz_info.txt** file contains simulation (number of particles, particle radius etc) and rendering information (light position, camera position etc), which can be inferred easily.
+**viz_info.txt** file contains simulation (number of particles, particle radius etc) and rendering information (light position, camera position etc), which can be inferred easily from the existing examples.
 
 **FluidFrame/frame.%4d.pos** files contain particle positions, which have the following format:
 ```
@@ -68,3 +67,6 @@ For each mesh i in numMeshes:
     Next (4 x 3 x numVerticesOfMesh[i]) bytes: array of vertex positions of mesh[i]
     Next (4 x 3 x numVerticesOfMesh[i]) bytes: array of vertex normals of mesh[i]
 ```
+
+---
+Happy coding!
