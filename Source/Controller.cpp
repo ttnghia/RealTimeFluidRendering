@@ -111,7 +111,7 @@ void Controller::setupPlaybackControllers()
     frameControlLayout->addLayout(m_sldFrameStep->getLayoutWithLabel("Step:"));
     QGroupBox* grpPlaybackControl = new QGroupBox("Playback Controls");
     grpPlaybackControl->setLayout(frameControlLayout);
-    m_LayoutRenderControllers->addWidget(grpPlaybackControl);
+    m_LayoutMainControllers->addWidget(grpPlaybackControl);
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -148,7 +148,7 @@ void Controller::setupFluidRenderModeControllers()
     pRenderModesGroup->setTitle(tr("Render Mode"));
     pRenderModesGroup->setLayout(pRenderModesLayout);
 
-    m_LayoutRenderControllers->addWidget(pRenderModesGroup);
+    m_LayoutMainControllers->addWidget(pRenderModesGroup);
 
     m_smFluidRenderMode = new QSignalMapper(this);
     connect(rdbPVSphere,    SIGNAL(clicked(bool)), m_smFluidRenderMode, SLOT(map()));
@@ -183,7 +183,7 @@ void Controller::setupRenderMaterialControllers()
     QGroupBox* colorModeGroup = new QGroupBox;
     colorModeGroup->setTitle(tr("Particle Color"));
     colorModeGroup->setLayout(colorModeLayout);
-    m_LayoutRenderControllers->addWidget(colorModeGroup);
+    m_LayoutMainControllers->addWidget(colorModeGroup);
 
     m_smParticleColorMode = new QSignalMapper(this);
     connect(rdbColorRandom,  SIGNAL(clicked()), m_smParticleColorMode, SLOT(map()));
@@ -227,7 +227,7 @@ void Controller::setupRenderMaterialControllers()
 
     QGroupBox* particleColorGroup = new QGroupBox("Material");
     particleColorGroup->setLayout(particleColorLayout);
-    m_LayoutRenderControllers->addWidget(particleColorGroup);
+    m_LayoutMainControllers->addWidget(particleColorGroup);
 
     ///////////////////////////////////////////////////////////////////////////////
     // Reflection and attennuation
@@ -243,7 +243,7 @@ void Controller::setupRenderMaterialControllers()
     fluidColorLayout->addLayout(m_sldFluidAttenuation->getLayoutWithLabel("Attennuation: "));
     QGroupBox* grpFluidColor = new QGroupBox("Render effects");
     grpFluidColor->setLayout(fluidColorLayout);
-    m_LayoutRenderControllers->addWidget(grpFluidColor);
+    m_LayoutMainControllers->addWidget(grpFluidColor);
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -271,7 +271,7 @@ void Controller::setupShadowControllers()
     QGroupBox* shadowGroup = new QGroupBox;
     shadowGroup->setTitle("Render Shadow");
     shadowGroup->setLayout(shadowLayout);
-    m_LayoutRenderControllers->addWidget(shadowGroup);
+    m_LayoutMainControllers->addWidget(shadowGroup);
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -297,7 +297,7 @@ void Controller::setupFilterControllers()
     QGroupBox* filterMethodGroup = new QGroupBox;
     filterMethodGroup->setTitle(tr("Surface Filter Method"));
     filterMethodGroup->setLayout(filterMethodLayout);
-    m_LayoutRenderControllers->addWidget(filterMethodGroup);
+    m_LayoutMainControllers->addWidget(filterMethodGroup);
 
     m_smFilterMethod = new QSignalMapper(this);
     connect(rdbBilateralGaussian, SIGNAL(clicked()), m_smFilterMethod, SLOT(map()));
@@ -334,7 +334,7 @@ void Controller::setupFilterControllers()
     filterControlLayout->addLayout(m_sldFilterSize->getLayoutWithLabel("Filter Size:"));
     QGroupBox* grpFilterControl = new QGroupBox("Filter Controls");
     grpFilterControl->setLayout(filterControlLayout);
-    m_LayoutRenderControllers->addWidget(grpFilterControl);
+    m_LayoutMainControllers->addWidget(grpFilterControl);
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
