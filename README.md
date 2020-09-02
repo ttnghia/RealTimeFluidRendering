@@ -13,7 +13,7 @@
 </table>
 </p>
 
-This is implementation of my i3D2018 paper "[A Narrow-Range Filter for Screen-Space Fluid Rendering](https://ttnghia.github.io/portfolio/narrow-range-filter/)". It is not the one that used in my paper but has been written from scratch for demonstration purpose and depends heavily on many external libraries, especially [Banana](https://github.com/ttnghia/Banana). Users should not expect to compile it by themselves but instead please download and run the provided binary (Windows x64) over the provided datasets.
+This is implementation of my i3D2018 paper "[A Narrow-Range Filter for Screen-Space Fluid Rendering](https://ttnghia.github.io/posts/narrow-range-filter/)". It is not the one that used in my paper but has been written from scratch for demonstration purpose and depends heavily on many external libraries, especially [Banana](https://github.com/ttnghia/Banana). Users should not expect to compile it by themselves but instead please download and run the provided binary (Windows x64) over the provided datasets.
 
 ### Download
 
